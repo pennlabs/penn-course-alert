@@ -1,0 +1,307 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <script src="https://use.fontawesome.com/d5a524b2fd.js"></script>
+    <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAACXBIWXMAABYlAAAWJQFJUiTwAAAC
+qUlEQVRYw+2Xz2sTQRTHvzO7/UH80ViD1KoYFZEehIJgix5aCfRYxUtJBNuL4kFoDmLEU/AieLH+
+A9IezK1YSw5aCKgQEQSpeGhrtbiS1lTzo12a3dpNZjy0jU0622Y3P05+j7Mz733evDczbwnnHFb1
+4KN6gVIySoAW3WDIMf4CwMDDDueSVVvUhnMXpWSCAC1bhi8DCMKGLAPMp6RAUqV7lIQEJSHhy08Z
+s3EZsZR0yxPS2q3aI6WmwBvW/RJBgJCCyJFc4fiTLZj6BkAw4nO8rghA37jukiW8pATnRN8FAJt6
+EvE5/GWlYMP5OzPnu2jQE9KGywLYiPw07KvfE9KGbAH4wnrQZuSinei2DEAp7qByCloqQm9Y98sU
+j4vH2w5S3O9oEBqKxnKIxnJ4NZc183Ui4nN8L2kHCNBlNcSLRyXc7axHoLPebMoVYZ0JAQiO7ebw
+2ZQBRWVQdeD8YQlXz6yb6jkpY3Qmi69pVrzEXTJAKcWnqAxTSYbkCseHhRwA5CFOHaAigPaKXMVm
+imeYrXWyXYfH96+zqw6guZGg/2xd/tu3NKs+wLW2OuH4xJww/5UHKNZihiMay2Hks1F+CjhHvPjV
+MzsFswmGH8vcNriwCDkwX+opWMzwsnauYqfgP0DFALxh/ToBjogmawYwnWKYTjFohmVfbk9I83tC
+mlP4GvaOas37Gsl7qw3IDi2ZmZYBuCM+x1LBDhDgZpndT6lqAuDfngJCemuY+m5RDbytIcDYNgDO
++SMOZGrg/BOAYWFL1jeuuySK2wCcZqv1VaOPcZ6/pn+pDKvGug2JEqVpb8NOrfhkxOcYs/VntKmu
+p7+fS/Rfe7WQzkJfy9sYUQKtA1W9iLI5fm+HVA1V/SaM3jg0s5blPRyIb32bAFxSAq2TVu39BS8W
+CJFblaXvAAAAAElFTkSuQmCC"/>
+    <title>Penn Course Alert</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+    <!--<script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>-->
+    <script type="text/javascript" src="{% static "pca/uri.js" %}"></script>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-21029575-12"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-21029575-12');
+    </script>
+    <style>
+    @import url('https://fonts.googleapis.com/css?family=Open+Sans:300');
+    body {
+      font-family: 'Open Sans', sans-serif;
+      background-color: #FAFCFF;
+      color: #2980B9;
+    }
+    a {
+      color: #2e416a;
+      text-decoration: none;
+    }
+    button {
+      display: inline-block;
+      padding: 1.2em 1.4em;
+      font-size: 1.3rem;
+      color: #FAFCFF;
+      text-transform: uppercase;
+      font-weight: bold;
+      letter-spacing: 1px;
+      font-size: 13px;
+      line-height: 13px;
+      border-radius: .25em;
+      background-color: #DF5D56;
+      border: none;
+      cursor: pointer;
+    }
+    button, select, input {
+      margin: 5px;
+    }
+    input {
+        border-style: hidden;
+        background-color: #2980B9;
+        padding: 10px 25px;
+        color: #FAFCFF;
+    }
+    input::placeholder {
+        color: #FAFCFF;
+        padding: .5em 0;
+        font-size: 1.3rem;
+        text-transform: uppercase;
+        font-weight: bold;
+        letter-spacing: 1px;
+        font-size: 13px;
+        line-height: 13px;
+    }
+    input[type="text"] {
+      width: 320px;
+    }
+    input[type="tel"] {
+      width: 320px;
+    }
+    input::-webkit-input-placeholder {
+        color: #FAFCFF;
+    }
+	input:-moz-placeholder {
+        color: #FAFCFF;
+    }
+	input::-moz-placeholder {
+        color: #FAFCFF;
+    }
+	input:-ms-input-placeholder {
+        color: #FAFCFF;
+    }
+    input:focus,
+    /*select:focus,*/
+    textarea:focus,
+    button:focus {
+        outline: none;
+    }
+    .error-msg {
+        color: #DF5D56;
+        margin-top: 1rem;
+    }
+    .success-msg {
+      color: #3fdf66;
+      margin-top: 1rem;
+    }
+    .full-screen {
+      height: 90vh;
+      min-height: 400px;
+    }
+    .lmk-text-align-center {
+      text-align: center;
+    }
+    .lmk-labs-byline {
+      color: black;
+    }
+    .lmk-labs-byline > a {
+      color: #0060B6;
+    }
+    .lmk-rec-element {
+      background-color: white;
+      cursor: pointer;
+      text-align: left;
+    }
+    .tt-dataset {
+      overflow: auto;
+      height: 15em;
+    }
+    .tt-menu {
+      width: 100%;
+    }
+
+    .lmk-command-icon {
+      float: right;
+    }
+    @media only screen and (min-width: 768px) {
+      button {
+          padding: 1.4em 1.8em;
+      }
+    }
+    img {
+      display: inline;
+      margin-right: 10px;
+      max-height: 3rem;
+      max-width: 3rem;
+    }
+    .lmk-rec-element:hover {
+      color: #FAFCFF;
+      background-color: #2980B9;
+    }
+    </style>
+  </head>
+  <body>
+    <div class="container full-screen d-flex align-items-center">
+      <div class="container">
+        <div class="row justify-content-center">
+          <img src="{% static "pca/PCA_logo.svg" %}"> <h1>Penn Course Alert</h1>
+        </div>
+        <div class="row justify-content-center">
+            <p id="description" class="lmk-text-align-center">Get notified when a course opens up by text and email</p>
+        </div>
+        <!-- Resubscribe and unsubscribe modal -->
+        <div class="modal" id="modal" tabindex="-1" role="dialog">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title">Penn Course Alert</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                <p>Would you like to keep receiving notifications?</p>
+              </div>
+              <button type="button" class="btn btn-primary" onClick='resubmit()'>Resubscribe</button>
+              <button type="button" id="unsubscribe" class="btn btn-default" onClick='resubscribe()'>Unsubscribe</button>
+              <script>
+                function resubmit() {
+                  $('#submit_form').submit();
+                }
+                function resubscribe() {
+                  const info = parseURL(window.location.href);
+                  window.location.href = "/unsubscribe?email="+info.email+"&course="+info.course;
+                }
+              </script>
+              <!--<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>-->
+
+            </div>
+          </div>
+        </div>
+        <div class="row justify-content-center">
+          <form id="submit_form" class="lmk-text-align-center" action="/submitted" method="POST">
+            <div id="bloodhound"><input type="text" class="typeahead" placeholder="Course" id="course" name="course" required></div>
+            <input type="text" placeholder="Email" id="email" name="email" required><br />
+            <!--<br />Optional: Text Message Notifications<br />-->
+            <input type="tel" placeholder="Phone Number (For SMS Alerts)" id="phone" name="phone"></br>
+            <!--Carrier<br /> action="/submitted" method="POST">-->
+            <select id="carrier" name="carrier">
+              <option selected disabled="disabled" value="nocarrier">Choose your carrier</option>
+              <option value="Verizon">Verizon</option>
+              <option value="ATT">AT&amp;T</option>
+              <option value="TMobile">T-Mobile</option>
+              <option value="Sprint">Sprint</option>
+              <option value="USCellular">US Cellular</option>
+            </select><br>
+            <input type="checkbox" placeholder="notifications" id="notifications" name="notifications"><label for="notifications">Keep Me Notified</label><br>
+            {% csrf_token %}
+            <button type="submit">Submit</button>
+          </form>
+
+        </div>
+      </div>
+    </div>
+    <footer class="footer">
+      <div class="container lmk-text-align-center lmk-labs-byline">
+          Made with 💖&nbsp;by <a href="http://pennlabs.org" target="_blank">Penn Labs</a>
+      </div>
+    </footer>
+
+    <script type="text/javascript" src="{% static "pca/jquery.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "pca/typeahead.bundle.js"%}"></script>
+    <script type="text/javascript" src="{% static "pca/searchbar.js"%}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
+
+
+    <script>
+
+      // on submission of form, update local storage to remember user's data
+      $('form').submit(e => {
+        localStorage.setItem('lmkEmail', e.target.email.value);
+        localStorage.setItem('lmkPhone', e.target.phone.value);
+        localStorage.setItem('lmkCarrier', e.target.carrier.value);
+        localStorage.setItem('lmkNotifications', e.target.notifications.checked);
+      });
+
+      // parses form info out of link
+      function parseURL(url) {
+        let formInfo = {};
+        const linkData = url.replace(/.*\?/, '').split('&');
+        for (let i = 0; i < linkData.length; i++) {
+            let split = linkData[i].split('=');
+            formInfo[split[0]] = split[1];
+        }
+        return formInfo;
+      }
+
+      // first, pre-populate form from local storage
+      $('#email').val(localStorage.getItem('lmkEmail'));
+      $('#phone').val(localStorage.getItem('lmkPhone'));
+      if (localStorage.getItem('lmkCarrier')) {
+        $('#carrier').val(localStorage.getItem('lmkCarrier'));
+      }
+
+      if (localStorage.getItem('lmkNotifications') === 'true') {
+        $('#notifications').prop('checked', true);
+      }
+
+      // if URL contains '?', then only pre-populate form from parsed URL element
+      // if it exists (in order to not overwrite local storage populated fields
+      // with undefined)
+      if (window.location.href.includes('?')) {
+        const info = parseURL(window.location.href)
+        if ('email' in info) {
+          $('#email').val(info.email);
+        }
+        if ('course' in info) {
+          $('#course').val(info.course)
+        }
+        if ('phone' in info) {
+          $('#phone').val(info.phone);
+        }
+        if ('carrier' in info) {
+          $('#carrier').val(info.carrier);
+        }
+        if ('notifications' in info) {
+          $('#notifications').prop('checked', true);
+        }
+        if ('error' in info) {
+        	if (info.error === 'courseIsOpen') {
+                $('#description').append("<div class='error-msg'>Error: Course already open</div>");
+            }
+            else if (info.error === 'backend') {
+              $('#description').append("<div class='error-msg'>Error: The Penn registrar has returned an error. Please try again later. We're sorry for the inconvenience!</div>");
+            }
+        }
+        if ('success' in info) {
+          $('#description').append("<div class='success-msg'>Registration Successful. Thank you for using Penn Course Alert!</div>");
+        }
+        if ('unsub' in info) {
+          $('#description').append('<div class="success-msg">Unsubscribe Successful. Thank you for using Penn Course Alert!</div>')
+        }
+        if ('action' in info) {
+          if (info.action === 'resubscribe') {
+            $('#modal').modal('show')
+          }
+        }
+      }
+    </script>
+  </body>
+</html>
