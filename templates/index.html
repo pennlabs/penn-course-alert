@@ -1,4 +1,3 @@
-{% load static %}
 <!DOCTYPE html>
 <html>
   <head>
@@ -21,7 +20,7 @@ mlP4GvaOas37Gsl7qw3IDi2ZmZYBuCM+x1LBDhDgZpndT6lqAuDfngJCemuY+m5RDbytIcDYNgDO
 p7+fS/Rfe7WQzkJfy9sYUQKtA1W9iLI5fm+HVA1V/SaM3jg0s5blPRyIb32bAFxSAq2TVu39BS8W
 CJFblaXvAAAAAElFTkSuQmCC"/>
     <title>Penn Course Alert</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.1/css/bulma.min.css">
     <!--<script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>-->
     <script type="text/javascript" src="{% static "pca/uri.js" %}"></script>
     <!-- Global site tag (gtag.js) - Google Analytics -->
@@ -34,137 +33,82 @@ CJFblaXvAAAAAElFTkSuQmCC"/>
       gtag('config', 'UA-21029575-12');
     </script>
     <style>
-    @import url('https://fonts.googleapis.com/css?family=Open+Sans:300');
-    body {
-      font-family: 'Open Sans', sans-serif;
-      background-color: #FAFCFF;
-      color: #2980B9;
-    }
-    a {
-      color: #2e416a;
-      text-decoration: none;
-    }
-    button {
-      display: inline-block;
-      padding: 1.2em 1.4em;
-      font-size: 1.3rem;
-      color: #FAFCFF;
-      text-transform: uppercase;
-      font-weight: bold;
-      letter-spacing: 1px;
-      font-size: 13px;
-      line-height: 13px;
-      border-radius: .25em;
-      background-color: #DF5D56;
-      border: none;
-      cursor: pointer;
-    }
-    button, select, input {
-      margin: 5px;
-    }
-    input {
-        border-style: hidden;
-        background-color: #2980B9;
-        padding: 10px 25px;
-        color: #FAFCFF;
-    }
-    input::placeholder {
-        color: #FAFCFF;
-        padding: .5em 0;
-        font-size: 1.3rem;
-        text-transform: uppercase;
-        font-weight: bold;
-        letter-spacing: 1px;
-        font-size: 13px;
-        line-height: 13px;
-    }
-    input[type="text"] {
-      width: 320px;
-    }
-    input[type="tel"] {
-      width: 320px;
-    }
-    input::-webkit-input-placeholder {
-        color: #FAFCFF;
-    }
-	input:-moz-placeholder {
-        color: #FAFCFF;
-    }
-	input::-moz-placeholder {
-        color: #FAFCFF;
-    }
-	input:-ms-input-placeholder {
-        color: #FAFCFF;
-    }
-    input:focus,
-    /*select:focus,*/
-    textarea:focus,
-    button:focus {
-        outline: none;
-    }
-    .error-msg {
-        color: #DF5D56;
-        margin-top: 1rem;
-    }
-    .success-msg {
-      color: #3fdf66;
-      margin-top: 1rem;
-    }
-    .full-screen {
-      height: 90vh;
-      min-height: 400px;
-    }
-    .lmk-text-align-center {
-      text-align: center;
-    }
-    .lmk-labs-byline {
-      color: black;
-    }
-    .lmk-labs-byline > a {
-      color: #0060B6;
-    }
-    .lmk-rec-element {
-      background-color: white;
-      cursor: pointer;
-      text-align: left;
-    }
-    .tt-dataset {
-      overflow: auto;
-      height: 15em;
-    }
-    .tt-menu {
-      width: 100%;
-    }
-
-    .lmk-command-icon {
-      float: right;
-    }
-    @media only screen and (min-width: 768px) {
-      button {
-          padding: 1.4em 1.8em;
+      body {
+        background-color: #fafcff;
+        position: relative;
+        padding-bottom: 150px;
       }
-    }
-    img {
-      display: inline;
-      margin-right: 10px;
-      max-height: 3rem;
-      max-width: 3rem;
-    }
-    .lmk-rec-element:hover {
-      color: #FAFCFF;
-      background-color: #2980B9;
-    }
+      .tt-menu {
+        width: 100%;
+      }
+      .lmk-rec-element {
+        background-color: white;
+        cursor: pointer;
+        text-align: left;
+      }
+      .lmk-command-icon {
+        float: right;
+      }
+      .lmk-rec-element:hover {
+        color: #FAFCFF;
+        background-color: #2588c0;
+      }
+      .tt-dataset {
+        overflow: auto;
+        height: 15em;
+        box-shadow: 0px 2px 4px;
+      }
+      .twitter-typeahead {
+        width: 100%;
+      }
+      .input {
+        border-style: hidden;
+        border-radius: 0px;
+        box-shadow: 0px 0px 8px 3px #F1F3F6;
+      }
+      .field {
+        padding-bottom: 0.5rem;
+      }
+      .footer {
+        background-color: #ffffff;
+        box-shadow: 0px 0px 8px 1px #F1F3F6;
+        position: absolute;
+        width: 100%;
+        bottom: 0px;
+      }
+
+      .title, .subtitle, p, label {
+        color: #4a4a4a;
+      }
+      .field {
+        padding-bottom:0.7rem;
+      }
+      .wrapper {
+        max-width:360px;
+        margin: 0 auto;
+        padding: 0;
+      }
+
     </style>
   </head>
   <body>
-    <div class="container full-screen d-flex align-items-center">
-      <div class="container">
-        <div class="row justify-content-center">
-          <img src="{% static "pca/PCA_logo.svg" %}"> <h1>Penn Course Alert</h1>
+    <section class="section is-block-mobile">
+      <div class="container has-text-centered">
+        <div class="level" style="margin-bottom:0.5rem">
+          <div class="level-item">
+            <figure class="image is-64x64" style="padding-right:1rem">
+            <img src="{% static "pca/PCA_logo.svg" %}">
+            </figure>
+            <h1 class="title">
+              Penn Course Alert
+            </h1>
+          </div>
         </div>
-        <div class="row justify-content-center">
-            <p id="description" class="lmk-text-align-center">Get notified when a course opens up by text and email</p>
-        </div>
+        <p class="subtitle is-size-5">
+        Get notified when a course opens up, by text and email
+        </p>
+      </div>
+
         <!-- Resubscribe and unsubscribe modal -->
         <div class="modal" id="modal" tabindex="-1" role="dialog">
           <div class="modal-dialog" role="document">
@@ -178,8 +122,8 @@ CJFblaXvAAAAAElFTkSuQmCC"/>
               <div class="modal-body">
                 <p>Would you like to keep receiving notifications?</p>
               </div>
-              <button type="button" class="btn btn-primary" onClick='resubmit()'>Resubscribe</button>
-              <button type="button" id="unsubscribe" class="btn btn-default" onClick='resubscribe()'>Unsubscribe</button>
+              <button type="button" class="button is-info" onClick='resubmit()'>Resubscribe</button>
+              <button type="button" id="unsubscribe" class="button is-info" onClick='resubscribe()'>Unsubscribe</button>
               <script>
                 function resubmit() {
                   $('#submit_form').submit();
@@ -194,32 +138,63 @@ CJFblaXvAAAAAElFTkSuQmCC"/>
             </div>
           </div>
         </div>
-        <div class="row justify-content-center">
-          <form id="submit_form" class="lmk-text-align-center" action="/submitted" method="POST">
-            <div id="bloodhound"><input type="text" class="typeahead" placeholder="Course" id="course" name="course" required></div>
-            <input type="text" placeholder="Email" id="email" name="email" required><br />
-            <!--<br />Optional: Text Message Notifications<br />-->
-            <input type="tel" placeholder="Phone Number (For SMS Alerts)" id="phone" name="phone"></br>
-            <!--Carrier<br /> action="/submitted" method="POST">-->
-            <select id="carrier" name="carrier">
-              <option selected disabled="disabled" value="nocarrier">Choose your carrier</option>
-              <option value="Verizon">Verizon</option>
-              <option value="ATT">AT&amp;T</option>
-              <option value="TMobile">T-Mobile</option>
-              <option value="Sprint">Sprint</option>
-              <option value="USCellular">US Cellular</option>
-            </select><br>
-            <input type="checkbox" placeholder="notifications" id="notifications" name="notifications"><label for="notifications">Keep Me Notified</label><br>
-            {% csrf_token %}
-            <button type="submit">Submit</button>
-          </form>
 
-        </div>
+      <div class="container has-text-centered is-block-mobile wrapper" style="margin-top:3.5rem" id="wrapper">
+        <form id="submit_form" action="/submitted" method="POST">
+          <div class="field" class="input-wrapper">
+            <div class="control" id="bloodhound">
+              <input class="input is-medium" id="courseTypeahead" type="text" placeholder="Course" id="course" name="course" required>
+            </div>
+          </div>
+          <div class="field" class="input-wrapper">
+            <div class="control">
+              <input class="input is-medium" type="text" placeholder="Email" id="email" name="email" required>
+            </div>
+          </div>
+          <div class="field">
+            <div class="control">
+              <!--<br />Optional: Text Message Notifications<br />-->
+              <input class="input is-medium" type="tel" placeholder="Phone number (for text alerts)" id="phone" name="phone">
+              <!--Carrier<br /> action="/submitted" method="POST">-->
+            </div>
+          </div>
+          <div class="level">
+          <div class="field level-left">
+            <div class="control level-item">
+              <div class="select">
+                <select id="carrier" name="carrier">
+                  <option selected disabled="disabled" value="nocarrier">Choose your carrier</option>
+                  <option value="Verizon">Verizon</option>
+                  <option value="ATT">AT&amp;T</option>
+                  <option value="TMobile">T-Mobile</option>
+                  <option value="Sprint">Sprint</option>
+                  <option value="USCellular">US Cellular</option>
+                </select><br>
+              </div>
+            </div>
+            <div class="control has-text-right level-item">
+              <label class="checkbox">
+                <input type="checkbox" placeholder="notifications" id="notifications" name="notifications"><label for="notifications"> Keep me notified</label>
+              </label>
+            </div>
+          </div>
+          </div>
+          {% csrf_token %}
+          <div class="control has-text-centered">
+            <a class="button is-info" type="submit">Submit</a>
+          </div>
+        </form>
       </div>
-    </div>
+    </section>
+    </body>
+
     <footer class="footer">
-      <div class="container lmk-text-align-center lmk-labs-byline">
-          Made with 💖&nbsp;by <a href="http://pennlabs.org" target="_blank">Penn Labs</a>
+      <div class="container">
+        <div class="content has-text-centered">
+          <p style="font-size:0.8rem">
+          Made with <span class="icon is-small" style="color:#F56F71"><i class="fa fa-heart"></i></span> by <a href="http://pennlabs.org" target="_blank">Penn Labs</a>
+          </p>
+        </div>
       </div>
     </footer>
 

@@ -4,7 +4,7 @@ function getDemandIcon(demand) {
     case 1:
     case 2:
     case 3:
-      return '<i style="color: limegreen" data-toggle="tooltip" data-placement="right" title="This course is in low demand" class="fa fa-thermometer-empty" aria-hidden="true"></i>'
+      return '<i style="color: #31CF65" data-toggle="tooltip" data-placement="right" title="This course is in low demand" class="fa fa-thermometer-empty" aria-hidden="true"></i>'
     case 4:
     case 5:
     case 6:
@@ -13,7 +13,7 @@ function getDemandIcon(demand) {
     case 8:
     case 9:
     case 10:
-      return '<i style="color: orangered" data-toggle="tooltip" data-placement="right" title="This course is in high demand" class="fa fa-thermometer-full" aria-hidden="true"></i>'
+      return '<i style="color: #FC3C63" data-toggle="tooltip" data-placement="right" title="This course is in high demand" class="fa fa-thermometer-full" aria-hidden="true"></i>'
   }
 }
 
@@ -28,7 +28,7 @@ $(document).ready(function(){
     }
     });
 
-  $('#bloodhound .typeahead').typeahead({
+  $('#bloodhound #courseTypeahead').typeahead({
     hint: true,
     highlight: false,
     minLength: 1,
@@ -38,18 +38,19 @@ $(document).ready(function(){
     source: courses,
     display: 'section_id',
     templates: {
-      empty: '<div class="lmk-rec-element list-group-item">No matching courses found.</div>',
+      empty: '<div class="lmk-rec-element card"><div class="card-content">No matching courses found.</div></div>',
       suggestion: function(data) {
         var instructors = ''
-        if(data.instructors.length != 0){ 
+        if(data.instructors.length != 0){
           var instructors = data.instructors.join(', ')
         }
-        return '<div class="lmk-rec-element list-group-item">' +
+        return '<div class="lmk-rec-element card">' +
           // '<p>' + data.section_id + '</p>' +
+          '<div class="card-content">' +
           data.section_id + '<br />' +
           '<small>' + data.course_title + '</small>' +
           '<span class="lmk-command-icon">'+getDemandIcon(data.demand)+'</span>' +
-          '</div>';
+          '</div></div>';
       }
     }
   });
