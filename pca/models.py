@@ -1,5 +1,5 @@
 import json
-
+import datetime
 from django.db import models
 
 
@@ -47,6 +47,7 @@ class Section(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
 
     is_open = models.BooleanField(default=False)
+    is_open_updated_at = models.DateTimeField(blank=True, null=True)
 
     capacity = models.IntegerField(default=0)
     activity = models.CharField(max_length=50, null=True, blank=True)
@@ -55,6 +56,11 @@ class Section(models.Model):
 
     def __str__(self):
         return '%s-%s %s' % (self.course.course_id, self.code, self.course.semester)
+
+    @property
+    def query_string(self):
+        """String used for querying updates to this section with the Penn API"""
+        return '%s-%s' % (self.course.course_id, self.code)
 
 
 def separate_course_code(course_code):
@@ -83,6 +89,7 @@ def upsert_course_from_opendata(info, semester):
     course.save()
 
     section.is_open = info['course_status'] == 'O'
+    section.is_open_updated_at = datetime.datetime.now()
     section.capacity = int(info['max_enrollment'])
     section.activity = info['activity']
     section.meeting_times = json.dumps([meeting['meeting_days'] + ' '

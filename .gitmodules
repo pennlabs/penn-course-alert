@@ -1,0 +1,3 @@
+[submodule "shortener"]
+	path = shortener
+	url = /Users/davis/projects/PennCourseAlert/shortener
