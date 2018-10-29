@@ -17,10 +17,8 @@ def register(request):
         phone = request.POST.get('phone', None)
 
         course, section = get_course_and_section(course_code, get_current_semester())
-        email = Email.objects.get_or_create(address=email_address)[0]
-        registration = Registration(section=section)
+        registration = Registration(section=section, email=email_address, phone=phone)
         registration.save()
-        registration.emails.add(email)
 
         return JsonResponse({
             'course': course.__str__(),
