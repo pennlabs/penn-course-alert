@@ -12,7 +12,7 @@ def send_alert(registration):
         'course': registration.section.normalized,
         'signup_url': registration.resub_url,
         'brand': 'Penn Course Alert'
-    }))
+    }), 'html')
 
     msg['Subject'] = '%s is now open!' % registration.section.normalized
     msg['From'] = 'Penn Course Alert <team@penncoursealert.com>'

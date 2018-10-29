@@ -1,9 +1,9 @@
 import json
-import datetime
 from urllib.parse import urlencode
 
 from django.db import models
 from django.conf import settings
+from django.utils import timezone
 
 from .alerts import email
 from shortener.models import shorten
@@ -95,7 +95,7 @@ def upsert_course_from_opendata(info, semester):
     course.save()
 
     section.is_open = info['course_status'] == 'O'
-    section.is_open_updated_at = datetime.datetime.now()
+    section.is_open_updated_at = timezone.now()
     section.capacity = int(info['max_enrollment'])
     section.activity = info['activity']
     section.meeting_times = json.dumps([meeting['meeting_days'] + ' '
@@ -135,7 +135,7 @@ class Registration(models.Model):
         return shorten(full_url).shortened
 
     def alert(self):
-        email.send_alert(self) # TODO: This can throw an exception.
+        email.send_alert(self)  # TODO: This can throw an exception.
         self.notification_sent = True
-        self.notification_sent_at = datetime.datetime.now()
+        self.notification_sent_at = timezone.now()
         self.save()
