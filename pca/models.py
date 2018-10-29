@@ -1,6 +1,12 @@
 import json
 import datetime
+from urllib.parse import urlencode
+
 from django.db import models
+from django.conf import settings
+
+from .alerts import email
+from shortener.models import shorten
 
 
 def get_current_semester():
@@ -58,7 +64,7 @@ class Section(models.Model):
         return '%s-%s %s' % (self.course.course_id, self.code, self.course.semester)
 
     @property
-    def query_string(self):
+    def normalized(self):
         """String used for querying updates to this section with the Penn API"""
         return '%s-%s' % (self.course.course_id, self.code)
 
@@ -101,20 +107,12 @@ def upsert_course_from_opendata(info, semester):
     section.save()
 
 
-class Email(models.Model):
-    created_at = models.DateTimeField(auto_now_add=True)
-    address = models.EmailField()
-
-    def __str__(self):
-        return self.address
-
-
 class Registration(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    emails = models.ManyToManyField(Email)
-    phone = models.CharField(blank=True, max_length=100)
+    email = models.EmailField(blank=True, null=True)
+    phone = models.CharField(blank=True, null=True, max_length=100)
     # section that the user registered to be notified about
     section = models.ForeignKey(Section, on_delete=models.CASCADE)
     # change to True once notification email has been sent out
@@ -123,3 +121,21 @@ class Registration(models.Model):
     # change to True if the user resubscribes from the notification associated with this registration
     resubscribed = models.BooleanField(default=False)
     resubscribed_at = models.DateTimeField(blank=True, null=True)
+
+    @property
+    def resub_url(self):
+        params = {'course': self.section.normalized, 'action': 'resubscribe'}
+        if self.email is not None:
+            params['email'] = self.email
+        if self.phone is not None:
+            params['phone'] = self.phone
+
+        query_string = '?%s' % urlencode(params)
+        full_url = '%s%s' % (settings.BASE_URL, query_string)
+        return shorten(full_url).shortened
+
+    def alert(self):
+        email.send_alert(self) # TODO: This can throw an exception.
+        self.notification_sent = True
+        self.notification_sent_at = datetime.datetime.now()
+        self.save()

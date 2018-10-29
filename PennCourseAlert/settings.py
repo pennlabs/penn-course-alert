@@ -136,3 +136,8 @@ if ENV == 'prod':
     BASE_URL = 'http://penncoursealert.com'
 else:
     BASE_URL = 'http://localhost:8000'
+
+SMTP_HOST = os.environ.get('SMTP_HOST', 'email-smtp.us-east-1.amazonaws.com')
+SMTP_PORT = os.environ.get('SMTP_PORT', 587)
+SMTP_USERNAME = os.environ.get('SMTP_USERNAME', '')
+SMTP_PASSWORD = os.environ.get('SMTP_PASSWORD', '')

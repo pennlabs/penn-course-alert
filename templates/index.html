@@ -112,20 +112,22 @@ CJFblaXvAAAAAElFTkSuQmCC"/>
 
         <!-- Resubscribe and unsubscribe modal -->
         <div class="modal" id="modal" tabindex="-1" role="dialog">
-          <div class="modal-dialog" role="document">
+            <div class="modal-background"></div>
+            <div class="modal-card">
+                <header class="modal-card-head">
+                  <p class="modal-card-title">Penn Course Alert</p>
+                  <button class="delete" aria-label="close"></button>
+                </header>
+                <section class="modal-card-body">
+                  <p>Would you like to keep receiving notifications?</p>
+                </section>
+                <footer class="modal-card-foot">
+                    <button class="button is-success" onClick='resubmit()'>Resubscribe</button>
+                    <button class="button is-warning" id="unsubscribe"  onClick='resubscribe()'>Unsubscribe</button>
+                </footer>
+              </div>
             <div class="modal-content">
-              <div class="modal-header">
-                <h5 class="modal-title">Penn Course Alert</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                  <span aria-hidden="true">&times;</span>
-                </button>
-              </div>
-              <div class="modal-body">
-                <p>Would you like to keep receiving notifications?</p>
-              </div>
-              <button type="button" class="button is-info" onClick='resubmit()'>Resubscribe</button>
-              <button type="button" id="unsubscribe" class="button is-info" onClick='resubscribe()'>Unsubscribe</button>
-              <script>
+                <script>
                 function resubmit() {
                   $('#submit_form').submit();
                 }
@@ -133,18 +135,15 @@ CJFblaXvAAAAAElFTkSuQmCC"/>
                   const info = parseURL(window.location.href);
                   window.location.href = "/unsubscribe?email="+info.email+"&course="+info.course;
                 }
-              </script>
-              <!--<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>-->
-
+                </script>
             </div>
-          </div>
         </div>
 
       <div class="container has-text-centered is-block-mobile wrapper" style="margin-top:3.5rem" id="wrapper">
         <form id="submit_form" action="/submitted" method="POST">
           <div class="field" class="input-wrapper">
             <div class="control" id="bloodhound">
-              <input class="input is-medium" id="courseTypeahead" type="text" placeholder="Course" id="course" name="course" required>
+              <input class="input is-medium" id="courseTypeahead" type="text" placeholder="Course" name="course" required>
             </div>
           </div>
           <div class="field" class="input-wrapper">
@@ -182,7 +181,7 @@ CJFblaXvAAAAAElFTkSuQmCC"/>
           </div>
           {% csrf_token %}
           <div class="control has-text-centered">
-            <a class="button is-info" type="submit">Submit</a>
+            <button class="button is-info" type="submit">Submit</button>
           </div>
         </form>
       </div>
@@ -243,11 +242,13 @@ CJFblaXvAAAAAElFTkSuQmCC"/>
       // with undefined)
       if (window.location.href.includes('?')) {
         const info = parseURL(window.location.href)
+
         if ('email' in info) {
-          $('#email').val(info.email);
+          $('#email').val(decodeURIComponent(info.email));
         }
         if ('course' in info) {
-          $('#course').val(info.course)
+            console.log('course is here')
+          $('#courseTypeahead').val(info.course)
         }
         if ('phone' in info) {
           $('#phone').val(info.phone);
@@ -274,10 +275,13 @@ CJFblaXvAAAAAElFTkSuQmCC"/>
         }
         if ('action' in info) {
           if (info.action === 'resubscribe') {
-            $('#modal').modal('show')
+            $('#modal').show()
           }
         }
       }
+      $('.modal-background').click(() => {
+          $('#modal').hide()
+      })
     </script>
   </body>
 </html>
