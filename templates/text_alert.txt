@@ -1,0 +1,1 @@
+{{course}} is now open! Register on Penn InTouch: http://tiny.cc/lmk. Resubscribe here: {{signup_url}}

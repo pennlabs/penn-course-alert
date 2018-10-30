@@ -251,7 +251,7 @@ CJFblaXvAAAAAElFTkSuQmCC"/>
           $('#courseTypeahead').val(info.course)
         }
         if ('phone' in info) {
-          $('#phone').val(info.phone);
+          $('#phone').val(decodeURIComponent(info.phone));
         }
         if ('carrier' in info) {
           $('#carrier').val(info.carrier);

@@ -5,8 +5,10 @@ from django.db import models
 from django.conf import settings
 from django.utils import timezone
 
-from .alerts import email
+from .alerts import Email, Text
 from shortener.models import shorten
+
+import phonenumbers  # library for parsing and formatting phone numbers.
 
 
 def get_current_semester():
@@ -122,20 +124,37 @@ class Registration(models.Model):
     resubscribed = models.BooleanField(default=False)
     resubscribed_at = models.DateTimeField(blank=True, null=True)
 
+    def validate_phone(self):
+        """Store phone numbers in the format recommended by Twilio."""
+        try:
+            phone_number = phonenumbers.parse(self.phone, 'US')
+            self.phone = phonenumbers.format_number(phone_number, phonenumbers.PhoneNumberFormat.E164)
+        except phonenumbers.phonenumberutil.NumberParseException:
+            # if the phone number is unparseable, don't include it.
+            self.phone = None
+
+    def save(self, *args, **kwargs):
+        self.validate_phone()
+        super().save(*args, **kwargs)
+
     @property
     def resub_url(self):
+        """Get the resubscribe URL associated with this registration"""
         params = {'course': self.section.normalized, 'action': 'resubscribe'}
         if self.email is not None:
             params['email'] = self.email
         if self.phone is not None:
-            params['phone'] = self.phone
+            phone_number = phonenumbers.parse(self.phone, 'US')
+            params['phone'] = phonenumbers.format_number(phone_number, phonenumbers.PhoneNumberFormat.NATIONAL)
 
         query_string = '?%s' % urlencode(params)
-        full_url = '%s%s' % (settings.BASE_URL, query_string)
+        full_url = '%s%s' % (settings.BASE_URL, query_string.replace('+', '%20'))
         return shorten(full_url).shortened
 
     def alert(self):
-        email.send_alert(self)  # TODO: This can throw an exception.
+        # TODO: Exception handling on send_alert()
+        Email(self).send_alert()
+        Text(self).send_alert()
         self.notification_sent = True
         self.notification_sent_at = timezone.now()
         self.save()

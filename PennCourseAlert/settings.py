@@ -141,3 +141,7 @@ SMTP_HOST = os.environ.get('SMTP_HOST', 'email-smtp.us-east-1.amazonaws.com')
 SMTP_PORT = os.environ.get('SMTP_PORT', 587)
 SMTP_USERNAME = os.environ.get('SMTP_USERNAME', '')
 SMTP_PASSWORD = os.environ.get('SMTP_PASSWORD', '')
+
+TWILIO_SID = os.environ.get('TWILIO_SID', '')
+TWILIO_AUTH_TOKEN = os.environ.get('TWILIO_TOKEN', '')
+TWILIO_NUMBER = os.environ.get('TWILIO_NUMBER', '+12153984277')
