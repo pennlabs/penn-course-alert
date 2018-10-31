@@ -95,6 +95,15 @@ CJFblaXvAAAAAElFTkSuQmCC"/>
   <body>
     <section class="section is-block-mobile">
       <div class="container has-text-centered">
+          {% if notification %}
+          <div class="notification {% if notification.type == 'success' %} is-success
+                                   {% elif notification.type == 'danger' %} is-danger
+                                   {% elif notification.type == 'warning' %} is-warning {% else %} is-info {% endif %}"
+               id="notificationBar">
+              <button class="delete" id="dismiss"></button>
+          {{ notification.text }}
+          </div>
+          {% endif %}
         <div class="level" style="margin-bottom:0.5rem">
           <div class="level-item">
             <figure class="image is-64x64" style="padding-right:1rem">
@@ -106,10 +115,34 @@ CJFblaXvAAAAAElFTkSuQmCC"/>
           </div>
         </div>
         <p class="subtitle is-size-5">
-        Get notified when a course opens up, by text and email
+        Get alerted when a course opens up, by text and email
         </p>
       </div>
 
+      <div class="container has-text-centered is-block-mobile wrapper" style="margin-top:3.5rem" id="wrapper">
+        <form id="submit_form" action="/submitted" method="POST">
+          <div class="field" class="input-wrapper">
+            <div class="control" id="bloodhound">
+              <input class="input is-medium" id="courseTypeahead" type="text" placeholder="Course" name="course" required>
+            </div>
+          </div>
+          <div class="field" class="input-wrapper">
+            <div class="control">
+              <input class="input is-medium" type="text" placeholder="Email" id="email" name="email" required>
+            </div>
+          </div>
+          <div class="field">
+            <div class="control">
+              <input class="input is-medium" type="tel" placeholder="Phone number (for text alerts)" id="phone" name="phone">
+            </div>
+          </div>
+          {% csrf_token %}
+          <div class="control has-text-centered">
+            <button class="button is-info" type="submit">Submit</button>
+          </div>
+        </form>
+      </div>
+    </section>
         <!-- Resubscribe and unsubscribe modal -->
         <div class="modal" id="modal" tabindex="-1" role="dialog">
             <div class="modal-background"></div>
@@ -138,54 +171,6 @@ CJFblaXvAAAAAElFTkSuQmCC"/>
                 </script>
             </div>
         </div>
-
-      <div class="container has-text-centered is-block-mobile wrapper" style="margin-top:3.5rem" id="wrapper">
-        <form id="submit_form" action="/submitted" method="POST">
-          <div class="field" class="input-wrapper">
-            <div class="control" id="bloodhound">
-              <input class="input is-medium" id="courseTypeahead" type="text" placeholder="Course" name="course" required>
-            </div>
-          </div>
-          <div class="field" class="input-wrapper">
-            <div class="control">
-              <input class="input is-medium" type="text" placeholder="Email" id="email" name="email" required>
-            </div>
-          </div>
-          <div class="field">
-            <div class="control">
-              <!--<br />Optional: Text Message Notifications<br />-->
-              <input class="input is-medium" type="tel" placeholder="Phone number (for text alerts)" id="phone" name="phone">
-              <!--Carrier<br /> action="/submitted" method="POST">-->
-            </div>
-          </div>
-          <div class="level">
-          <div class="field level-left">
-            <div class="control level-item">
-              <div class="select">
-                <select id="carrier" name="carrier">
-                  <option selected disabled="disabled" value="nocarrier">Choose your carrier</option>
-                  <option value="Verizon">Verizon</option>
-                  <option value="ATT">AT&amp;T</option>
-                  <option value="TMobile">T-Mobile</option>
-                  <option value="Sprint">Sprint</option>
-                  <option value="USCellular">US Cellular</option>
-                </select><br>
-              </div>
-            </div>
-            <div class="control has-text-right level-item">
-              <label class="checkbox">
-                <input type="checkbox" placeholder="notifications" id="notifications" name="notifications"><label for="notifications"> Keep me notified</label>
-              </label>
-            </div>
-          </div>
-          </div>
-          {% csrf_token %}
-          <div class="control has-text-centered">
-            <button class="button is-info" type="submit">Submit</button>
-          </div>
-        </form>
-      </div>
-    </section>
     </body>
 
     <footer class="footer">
@@ -282,6 +267,9 @@ CJFblaXvAAAAAElFTkSuQmCC"/>
       $('.modal-background').click(() => {
           $('#modal').hide()
       })
+        $('#dismiss').click(() => {
+            $('#notificationBar').slideUp()
+        })
     </script>
   </body>
 </html>

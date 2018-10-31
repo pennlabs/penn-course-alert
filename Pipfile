@@ -9,6 +9,7 @@ mysqlclient = "*"
 requests = "*"
 twilio = "*"
 phonenumbers = "*"
+django-extensions = "*"
 
 [dev-packages]
 

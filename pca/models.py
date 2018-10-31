@@ -4,6 +4,7 @@ from urllib.parse import urlencode
 from django.db import models
 from django.conf import settings
 from django.utils import timezone
+from django import urls
 
 from .alerts import Email, Text
 from shortener.models import shorten
@@ -120,9 +121,15 @@ class Registration(models.Model):
     # change to True once notification email has been sent out
     notification_sent = models.BooleanField(default=False)
     notification_sent_at = models.DateTimeField(blank=True, null=True)
-    # change to True if the user resubscribes from the notification associated with this registration
-    resubscribed = models.BooleanField(default=False)
-    resubscribed_at = models.DateTimeField(blank=True, null=True)
+
+    # track resubscriptions
+    resubscribed_from = models.OneToOneField('Registration',
+                                             null=True,
+                                             on_delete=models.SET_NULL,
+                                             related_name='resubscribed_to')
+
+    def __str__(self):
+        return '%s: %s' % (self.email, self.section.__str__())
 
     def validate_phone(self):
         """Store phone numbers in the format recommended by Twilio."""
@@ -140,15 +147,7 @@ class Registration(models.Model):
     @property
     def resub_url(self):
         """Get the resubscribe URL associated with this registration"""
-        params = {'course': self.section.normalized, 'action': 'resubscribe'}
-        if self.email is not None:
-            params['email'] = self.email
-        if self.phone is not None:
-            phone_number = phonenumbers.parse(self.phone, 'US')
-            params['phone'] = phonenumbers.format_number(phone_number, phonenumbers.PhoneNumberFormat.NATIONAL)
-
-        query_string = '?%s' % urlencode(params)
-        full_url = '%s%s' % (settings.BASE_URL, query_string.replace('+', '%20'))
+        full_url = '%s%s' % (settings.BASE_URL, urls.reverse('resubscribe', kwargs={'id_': self.id}))
         return shorten(full_url).shortened
 
     def alert(self):
@@ -158,3 +157,17 @@ class Registration(models.Model):
         self.notification_sent = True
         self.notification_sent_at = timezone.now()
         self.save()
+
+    def resubscribe(self):
+        r = self
+        while hasattr(r, 'resubscribed_to'):  # follow the chain of resubscriptions to the most recent one.
+            r = r.resubscribed_to
+        if not r.notification_sent:  # if a notification hasn't been sent on this recent one,
+            return self  # don't create duplicate registrations for no reason.
+
+        new_registration = Registration(email=self.email,
+                                        phone=self.phone,
+                                        section=self.section,
+                                        resubscribed_from=self)
+        new_registration.save()
+        return new_registration
