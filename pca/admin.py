@@ -1,8 +1,29 @@
 from django.contrib import admin
-
-# Register your models here.
+from django.urls import reverse
+from django.utils.html import format_html
 from .models import *
 
-admin.site.register(Course)
-admin.site.register(Section)
-admin.site.register(Registration)
+# !!!IMPORTANT NOTE!!!: search_fields contains fields on related objects. This means search queries WILL PERFORM JOINS.
+# If this gets too slow, REMOVE THE RELATED FIELDS FROM `search_fields`.
+
+
+class RegistrationAdmin(admin.ModelAdmin):
+    readonly_fields = ('section_link',)
+    search_fields = ('email', 'phone', 'section__course__department', 'section__course__code', 'section__code')
+
+    def section_link(self, instance):
+        link = reverse('admin:pca_section_change', args=[instance.id])
+        return format_html('<a href="{}">{}</a>', link, instance.section.__str__())
+
+
+class CourseAdmin(admin.ModelAdmin):
+    search_fields = ('department', 'code', 'semester')
+
+
+class SectionAdmin(admin.ModelAdmin):
+    search_fields = ('course__department', 'course__code', 'code', 'course__semester')
+
+
+admin.site.register(Course, CourseAdmin)
+admin.site.register(Section, SectionAdmin)
+admin.site.register(Registration, RegistrationAdmin)
