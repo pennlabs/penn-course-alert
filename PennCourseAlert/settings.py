@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 
 import os
+import dj_database_url
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -80,14 +81,7 @@ WSGI_APPLICATION = 'PennCourseAlert.wsgi.application'
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'pca',
-        'USER': os.getenv('db_username', 'pca'),
-        'PASSWORD': os.getenv('db_password', 'password'),
-        'HOST': os.getenv('db_host', '127.0.0.1'),
-        'PORT': os.getenv('db_port', '3306'),
-    }
+    'default': dj_database_url.config(default='mysql://pca:password@127.0.0.1:3306/pca')
 }
 
 
@@ -149,5 +143,6 @@ TWILIO_SID = os.environ.get('TWILIO_SID', '')
 TWILIO_AUTH_TOKEN = os.environ.get('TWILIO_TOKEN', '')
 TWILIO_NUMBER = os.environ.get('TWILIO_NUMBER', '+12153984277')
 
-MESSAGE_BROKER_URL = os.environ.get('CELERY_BROKER_URL', 'redis://localhost')
+MESSAGE_BROKER_URL = os.environ.get('REDIS_URL', 'redis://localhost')
+
 SENTRY_KEY = os.environ.get('SENTRY_KEY', '')

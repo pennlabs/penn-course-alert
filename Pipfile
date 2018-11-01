@@ -12,8 +12,9 @@ phonenumbers = "*"
 django-extensions = "*"
 celery = "*"
 redis = "*"
-django-celery-beat = "*"
 sentry-sdk = "*"
+dj-database-url = "*"
+django-celery-beat = {file = "https://github.com/celery/django-celery-beat/zipball/master"}
 
 [dev-packages]
 
