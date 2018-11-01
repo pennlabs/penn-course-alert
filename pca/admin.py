@@ -22,8 +22,19 @@ class CourseAdmin(admin.ModelAdmin):
 
 class SectionAdmin(admin.ModelAdmin):
     search_fields = ('course__department', 'course__code', 'code', 'course__semester')
+    readonly_fields = ('course_link',)
+    autocomplete_fields = ('instructors', )
+
+    def course_link(self, instance):
+        link = reverse('admin:pca_course_change', args=[instance.id])
+        return format_html('<a href="{}">{}</a>', link, instance.course.__str__())
 
 
+class InstructorAdmin(admin.ModelAdmin):
+    search_fields = ('name', )
+
+
+admin.site.register(Instructor, InstructorAdmin)
 admin.site.register(Course, CourseAdmin)
 admin.site.register(Section, SectionAdmin)
 admin.site.register(Registration, RegistrationAdmin)
