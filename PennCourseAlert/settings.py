@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'shortener.apps.ShortenerConfig',
     'options.apps.OptionsConfig',
     'django_extensions',
+    'django_celery_beat',
 ]
 
 MIDDLEWARE = [
@@ -147,3 +148,5 @@ SMTP_PASSWORD = os.environ.get('SMTP_PASSWORD', '')
 TWILIO_SID = os.environ.get('TWILIO_SID', '')
 TWILIO_AUTH_TOKEN = os.environ.get('TWILIO_TOKEN', '')
 TWILIO_NUMBER = os.environ.get('TWILIO_NUMBER', '+12153984277')
+
+MESSAGE_BROKER_URL = os.environ.get('CELERY_BROKER_URL', 'redis://localhost')

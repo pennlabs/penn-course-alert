@@ -1,3 +1,6 @@
 [submodule "shortener"]
 	path = shortener
 	url = https://github.com/pennlabs/shortener.git
+[submodule "options"]
+	path = options
+	url = https://github.com/davish/django-options.git
