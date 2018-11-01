@@ -8,6 +8,21 @@ from django.conf import settings
 from twilio.rest import Client
 
 
+def send_email(from_, to, subject, html):
+    msg = MIMEText(html, 'html')
+    msg['Subject'] = subject
+    msg['From'] = from_
+    msg['To'] = to
+
+    with SMTP(settings.SMTP_HOST, settings.SMTP_PORT) as server:
+        server.ehlo()
+        server.starttls()
+        server.ehlo()
+        server.login(settings.SMTP_USERNAME, settings.SMTP_PASSWORD)
+        server.send_message(msg)
+        return True
+
+
 class Alert(ABC):
     def __init__(self, template, reg):
         t = loader.get_template(template)
@@ -31,17 +46,10 @@ class Email(Alert):
         if self.registration.email is None:
             return False
 
-        msg = MIMEText(self.text, 'html')
-        msg['Subject'] = '%s is now open!' % self.registration.section.normalized
-        msg['From'] = 'Penn Course Alert <team@penncoursealert.com>'
-        msg['To'] = self.registration.email
-        with SMTP(settings.SMTP_HOST, settings.SMTP_PORT) as server:
-            server.ehlo()
-            server.starttls()
-            server.ehlo()
-            server.login(settings.SMTP_USERNAME, settings.SMTP_PASSWORD)
-            server.send_message(msg)
-            return True
+        return send_email(from_='Penn Course Alert <team@penncoursealert.com>',
+                          to=self.registration.email,
+                          subject='%s is now open!' % self.registration.section.normalized,
+                          html=self.text)
 
 
 class Text(Alert):

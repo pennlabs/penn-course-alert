@@ -153,11 +153,12 @@ class Registration(models.Model):
 
     def alert(self):
         # TODO: Exception handling on send_alert()
-        Email(self).send_alert()
-        Text(self).send_alert()
+        email_result = Email(self).send_alert()
+        text_result = Text(self).send_alert()
         self.notification_sent = True
         self.notification_sent_at = timezone.now()
         self.save()
+        return email_result is not None and text_result is not None  # True if no error in email/text.
 
     def resubscribe(self):
         r = self
