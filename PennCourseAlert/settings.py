@@ -150,3 +150,4 @@ TWILIO_AUTH_TOKEN = os.environ.get('TWILIO_TOKEN', '')
 TWILIO_NUMBER = os.environ.get('TWILIO_NUMBER', '+12153984277')
 
 MESSAGE_BROKER_URL = os.environ.get('CELERY_BROKER_URL', 'redis://localhost')
+SENTRY_KEY = os.environ.get('SENTRY_KEY', '')

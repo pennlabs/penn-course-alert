@@ -13,6 +13,7 @@ django-extensions = "*"
 celery = "*"
 redis = "*"
 django-celery-beat = "*"
+sentry-sdk = "*"
 
 [dev-packages]
 
