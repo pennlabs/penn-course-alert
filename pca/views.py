@@ -4,6 +4,16 @@ from django.template import loader
 from .models import *
 
 
+# Helper function to return the homepage with a banner message.
+def homepage_with_msg(request, type_, msg):
+    return render(request, 'index.html', {
+        'notification': {
+            'type': type_,
+            'text': msg
+        }
+    })
+
+
 def index(request):
     return render(request, 'index.html')
 
@@ -20,17 +30,14 @@ def register(request):
         registration.validate_phone()
 
         if Registration.objects.filter(section=section, email=email_address, phone=registration.phone, notification_sent=False).exists():
-            return render(request, 'index.html', {
-                'notification': {
-                    'type': 'warning',
-                    'text': "You've already registered to get alerts for %s!" % section.normalized
-                }
-            })
+            return homepage_with_msg(request,
+                                     'warning',
+                                     "You've already registered to get alerts for %s!" % section.normalized)
 
         registration.save()
-        return homepage(request,
-                        'success',
-                        'Your registration for %s was successful!' % section.normalized)
+        return homepage_with_msg(request,
+                                 'success',
+                                 'Your registration for %s was successful!' % section.normalized)
     else:
         raise Http404('GET not accepted')
 
@@ -41,15 +48,6 @@ def resubscribe(request, id_):
     else:
         old_reg = Registration.objects.get(id=id_)
         new_reg = old_reg.resubscribe()
-        return homepage(request,
-                        'info',
-                        'You have been resubscribed for alerts to %s!' % new_reg.section.normalized)
-
-
-def homepage(request, type_, msg):
-    return render(request, 'index.html', {
-        'notification': {
-            'type': type_,
-            'text': msg
-        }
-    })
+        return homepage_with_msg(request,
+                                 'info',
+                                 'You have been resubscribed for alerts to %s!' % new_reg.section.normalized)
