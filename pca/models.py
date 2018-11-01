@@ -8,12 +8,13 @@ from django import urls
 
 from .alerts import Email, Text
 from shortener.models import shorten
+from options.models import get_value
 
 import phonenumbers  # library for parsing and formatting phone numbers.
 
 
 def get_current_semester():
-    return '2018C'
+    return get_value('SEMESTER', '2019C')
 
 
 class Instructor(models.Model):

@@ -2,6 +2,7 @@ from django.core.management.base import BaseCommand, CommandError
 
 from pca.models import *
 from pca import api
+from pca.tasks import prepare_alerts
 
 
 def send_alerts(section_code, registrations, semester, should_send=False):
@@ -22,16 +23,4 @@ class Command(BaseCommand):
         parser.add_argument('--noMock', action="store_true", help='actually send alerts')
 
     def handle(self, *args, **options):
-        should_send = options['noMock']
-        semester = get_current_semester()
-        alerts = {}
-        for reg in Registration.objects.filter(section__course__semester=semester, notification_sent=False):
-            # Group registrations into buckets based on their associated section
-            sect = reg.section.normalized
-            if sect in alerts:
-                alerts[sect].append(reg)
-            else:
-                alerts[sect] = [reg]
-
-        for section_code, registrations in alerts.items():
-            send_alerts(section_code, registrations, semester, should_send)
+        prepare_alerts.delay()

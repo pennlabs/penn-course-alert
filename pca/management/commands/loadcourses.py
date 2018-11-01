@@ -2,6 +2,7 @@ from django.core.management.base import BaseCommand, CommandError
 from django.conf import settings
 
 from pca import api, models
+from pca.tasks import load_courses
 
 
 class Command(BaseCommand):
@@ -21,8 +22,4 @@ class Command(BaseCommand):
         semester = options['semester'].split('=')[-1]
         query = options['query'].split('=')[-1]
 
-        self.stdout.write('load in courses with prefix %s from %s' % (query, semester))
-        results = api.get_courses(query, semester)
-
-        for course in results:
-            models.upsert_course_from_opendata(course, semester)
+        load_courses.delay(query, semester)
