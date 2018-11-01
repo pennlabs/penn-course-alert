@@ -93,17 +93,17 @@ CJFblaXvAAAAAElFTkSuQmCC"/>
     </style>
   </head>
   <body>
+ {% if notification %}
+  <div class="has-text-centered notification {% if notification.type == 'success' %} is-success
+                                             {% elif notification.type == 'danger' %} is-danger
+                                             {% elif notification.type == 'warning' %} is-warning {% else %} is-info {% endif %}"
+       id="notificationBar">
+      <button class="delete" id="dismiss"></button>
+  {{ notification.text }}
+  </div>
+  {% endif %}
     <section class="section is-block-mobile">
       <div class="container has-text-centered">
-          {% if notification %}
-          <div class="notification {% if notification.type == 'success' %} is-success
-                                   {% elif notification.type == 'danger' %} is-danger
-                                   {% elif notification.type == 'warning' %} is-warning {% else %} is-info {% endif %}"
-               id="notificationBar">
-              <button class="delete" id="dismiss"></button>
-          {{ notification.text }}
-          </div>
-          {% endif %}
         <div class="level" style="margin-bottom:0.5rem">
           <div class="level-item">
             <figure class="image is-64x64" style="padding-right:1rem">
