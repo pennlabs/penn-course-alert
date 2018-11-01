@@ -16,6 +16,8 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
+admin.site.site_header = 'Penn Course Alert Admin'
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('s/', include('shortener.urls')),
