@@ -3,7 +3,7 @@ from celery import shared_task
 
 from .models import *
 from pca import api
-from options.models import get_value
+from options.models import get_value, get_bool
 
 logger = logging.getLogger(__name__)
 
@@ -46,6 +46,9 @@ def send_alerts_for(section_code, registrations, semester):
 def prepare_alerts(semester=None):
     if semester is None:
         semester = get_value('SEMESTER')
+
+    if not get_bool('SEND_ALERTS', False):
+        return {'task': 'pca.tasks.prepare_alerts', 'result': 'aborted -- SEND_ALERTS=False'}
 
     alerts = {}
     for reg in Registration.objects.filter(section__course__semester=semester, notification_sent=False):
