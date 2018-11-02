@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponseRedirect, JsonResponse, Http404
 from django.template import loader
 from .models import *
+from options.models import get_bool
 
 
 # Helper function to return the homepage with a banner message.
@@ -15,14 +16,23 @@ def homepage_with_msg(request, type_, msg):
 
 
 def index(request):
+    if not get_bool('REGISTRATION_OPEN', True):
+        return homepage_with_msg(request,
+                                 'danger',
+                                 'Registration is currently closed. Come back after schedules have been released!')
+
     return render(request, 'index.html')
 
 
 def register(request):
+    if not get_bool('REGISTRATION_OPEN', True):
+        return homepage_with_msg(request,
+                                 'danger',
+                                 'Registration is currently closed. Come back after schedules have been released!')
+
     if request.method == 'POST':
         course_code = request.POST.get('course', None)
         email_address = request.POST.get('email', None)
-        carrier = request.POST.get('carrier', None)
         phone = request.POST.get('phone', None)
 
         course, section = get_course_and_section(course_code, get_current_semester())
