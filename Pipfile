@@ -17,6 +17,7 @@ dj-database-url = "*"
 django-celery-beat = "*"
 django-celery-results = "*"
 gunicorn = "*"
+whitenoise = "*"
 
 [dev-packages]
 
