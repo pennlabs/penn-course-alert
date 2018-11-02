@@ -30,9 +30,9 @@ jobs:
       - restore_cache:  # ensure this step occurs *before* installing dependencies
           key: deps9-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
       - run:
-        command: |  # use pipenv to install dependencies
-          sudo pip install pipenv
-          pipenv install
+          command: |  # use pipenv to install dependencies
+            sudo pip install pipenv
+            pipenv install
       - save_cache:
           key: deps9-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
           paths:
@@ -40,8 +40,8 @@ jobs:
             - "/usr/local/bin"
             - "/usr/local/lib/python3.6/site-packages"
       - run:
-        command: |
-          pipenv run "python manage.py test"
+          command: |
+            pipenv run "python manage.py test"
       - store_test_results:
           path: test-results
       - store_artifacts:
