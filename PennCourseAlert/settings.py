@@ -26,7 +26,7 @@ SECRET_KEY = 'v*l-%3la#%a_)r8m4%5oz9l#v+b&$r)0lje8%gj5&7_uk!0@3@'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('MODE', 'dev') != 'prod'
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['penncoursealert.com', 'www.penncoursealert.com']
 
 
 # Application definition
