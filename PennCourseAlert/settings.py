@@ -42,8 +42,8 @@ INSTALLED_APPS = [
     'shortener.apps.ShortenerConfig',
     'options.apps.OptionsConfig',
     'django_extensions',
-    'django_celery_beat',
     'django_celery_results',
+    'django_celery_beat',
 ]
 
 MIDDLEWARE = [

@@ -17,6 +17,7 @@ dj-database-url = "*"
 django-celery-beat = {file = "https://github.com/celery/django-celery-beat/zipball/master"}
 django-celery-results = "*"
 gunicorn = "*"
+django-timezone-field = "*"
 
 [dev-packages]
 
