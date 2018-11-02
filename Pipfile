@@ -18,8 +18,9 @@ django-celery-beat = {file = "https://github.com/celery/django-celery-beat/zipba
 django-celery-results = "*"
 gunicorn = "*"
 django-timezone-field = "*"
+crontab = "*"
 
 [dev-packages]
 
 [requires]
-python_version = "3.6.6"
+python_version = "3.7"
