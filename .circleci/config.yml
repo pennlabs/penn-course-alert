@@ -69,6 +69,9 @@ jobs:
     steps:
       - checkout
       - run:
+          command: |
+            mkdir ~/.ssh/ && echo -e "Host apps.pennlabs.org\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
+      - run:
           name: Deploy master to Dokku
           command: |
             git push dokku@apps.pennlabs.org:penncoursealert master
