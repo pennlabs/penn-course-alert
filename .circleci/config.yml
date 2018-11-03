@@ -70,7 +70,7 @@ jobs:
       - checkout
       - run:
           command: |
-            mkdir ~/.ssh/ && echo -e "Host apps.pennlabs.org\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
+            echo -e "Host apps.pennlabs.org\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
       - run:
           name: Deploy master to Dokku
           command: |
