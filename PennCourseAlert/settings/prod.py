@@ -1,5 +1,5 @@
 # Settings when deployed to Dokku
-from .settings import *  # noqa
+from .base import *  # noqa
 
 # Disable Django's own staticfiles handling in favour of WhiteNoise, for
 # greater consistency between gunicorn and `./manage.py runserver`. See:

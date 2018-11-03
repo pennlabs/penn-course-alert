@@ -13,7 +13,7 @@ jobs:
       - image: circleci/python:3.7.1
         environment:
           PIPENV_VENV_IN_PROJECT: true
-          DATABASE_URL: mysql://root:password@localhost:3306/circle_test
+          DATABASE_URL: mysql://root:password@127.0.0.1:3306/circle_test
       - image: circleci/mysql:latest
         environment:
           MYSQL_ROOT_PASSWORD: password
