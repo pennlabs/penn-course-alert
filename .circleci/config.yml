@@ -15,6 +15,7 @@ jobs:
           PIPENV_VENV_IN_PROJECT: true
           DATABASE_URL: mysql://root:password@127.0.0.1:3306/circle_test
       - image: circleci/mysql:latest
+        command: --default-authentication-plugin=mysql_native_password
         environment:
           MYSQL_ROOT_PASSWORD: password
           MYSQL_DATABASE: circle_test
@@ -40,12 +41,13 @@ jobs:
           environment:
             DOCKERIZE_VERSION: v0.3.0
       - run:
-          name: Wait for db
-          command: dockerize -wait tcp://localhost:3306 -timeout 1m
-      - run:
+          name: Install dependencies
           command: |  # use pipenv to install dependencies
             sudo pip install pipenv
             pipenv install
+      - run:
+          name: Wait for db
+          command: dockerize -wait tcp://localhost:3306 -timeout 1m
       - save_cache:
           key: deps9-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
           paths:
