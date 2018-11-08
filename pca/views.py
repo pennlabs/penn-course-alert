@@ -31,7 +31,7 @@ def register(request):
     if not get_bool('REGISTRATION_OPEN', True):
         return homepage_with_msg(request,
                                  'danger',
-                                 'Registration is currently closed. Come back after schedules have been released!')
+                                 'Alert signup is currently closed. Come back after schedules have been released!')
 
     if request.method == 'POST':
         course_code = request.POST.get('course', None)
@@ -42,7 +42,10 @@ def register(request):
         registration = Registration(section=section, email=email_address, phone=phone)
         registration.validate_phone()
 
-        if Registration.objects.filter(section=section, email=email_address, phone=registration.phone, notification_sent=False).exists():
+        if Registration.objects.filter(section=section,
+                                       email=email_address,
+                                       phone=registration.phone,
+                                       notification_sent=False).exists():
             return homepage_with_msg(request,
                                      'warning',
                                      "You've already registered to get alerts for %s!" % section.normalized)
