@@ -1,7 +1,10 @@
+import redis
+
 from django.shortcuts import render
 from django.http import HttpResponseRedirect, JsonResponse, Http404
 from django.template import loader
 from .models import *
+from .tasks import generate_course_json
 from options.models import get_bool
 
 
@@ -61,3 +64,8 @@ def resubscribe(request, id_):
         return homepage_with_msg(request,
                                  'info',
                                  'You have been resubscribed for alerts to %s!' % new_reg.section.normalized)
+
+
+def get_sections(request):
+    sections = generate_course_json()
+    return JsonResponse(sections, safe=False)

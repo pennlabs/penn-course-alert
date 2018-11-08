@@ -146,6 +146,8 @@ TWILIO_SID = os.environ.get('TWILIO_SID', '')
 TWILIO_AUTH_TOKEN = os.environ.get('TWILIO_TOKEN', '')
 TWILIO_NUMBER = os.environ.get('TWILIO_NUMBER', '+12153984277')
 
+REDIS_URL = os.environ.get('REDIS_URL', 'redis://localhost')
+
 MESSAGE_BROKER_URL = os.environ.get('REDIS_URL', 'redis://localhost')
 CELERY_RESULT_BACKEND = 'django-db'
 task_routes = {

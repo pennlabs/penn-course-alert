@@ -1,4 +1,6 @@
 function getDemandIcon(demand) {
+  if (!demand)
+    return '';
   switch(demand) {
     case 0:
     case 1:
@@ -21,11 +23,11 @@ $(document).ready(function(){
   var courses = new Bloodhound({
     datumTokenizer: Bloodhound.tokenizers.obj.whitespace('section_id'),
     queryTokenizer: Bloodhound.tokenizers.whitespace,
-    // prefetch: '/courses'
-    remote: {
-      url: '/courses?dept=%QUERY',
-      wildcard: '%QUERY'
-    }
+    prefetch: '/courses'
+    // remote: {
+    //   url: '/courses?dept=%QUERY',
+    //   wildcard: '%QUERY'
+    // }
     });
 
   $('#bloodhound #courseTypeahead').typeahead({
@@ -42,13 +44,14 @@ $(document).ready(function(){
       suggestion: function(data) {
         var instructors = ''
         if(data.instructors.length != 0){
-          var instructors = data.instructors.join(', ')
+          instructors = data.instructors.join(', ')
         }
         return '<div class="lmk-rec-element card">' +
           // '<p>' + data.section_id + '</p>' +
           '<div class="card-content">' +
           data.section_id + '<br />' +
-          '<small>' + data.course_title + '</small>' +
+          '<small>' + data.course_title + '</small><br />' +
+          '<small>' + instructors +'</small>'+
           '<span class="lmk-command-icon">'+getDemandIcon(data.demand)+'</span>' +
           '</div></div>';
       }
