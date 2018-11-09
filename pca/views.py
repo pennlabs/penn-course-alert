@@ -2,6 +2,7 @@ import redis
 
 from django.shortcuts import render
 from django.http import HttpResponseRedirect, JsonResponse, Http404
+from django.urls import reverse
 from django.template import loader
 from .models import *
 from .tasks import generate_course_json
@@ -18,20 +19,22 @@ def homepage_with_msg(request, type_, msg):
     })
 
 
+def homepage_closed(request):
+    return homepage_with_msg(request,
+                             'danger',
+                             "We're currently closed for signups. Come back after schedules have been released!")
+
+
 def index(request):
     if not get_bool('REGISTRATION_OPEN', True):
-        return homepage_with_msg(request,
-                                 'danger',
-                                 'Registration is currently closed. Come back after schedules have been released!')
+        return homepage_closed(request)
 
     return render(request, 'index.html')
 
 
 def register(request):
     if not get_bool('REGISTRATION_OPEN', True):
-        return homepage_with_msg(request,
-                                 'danger',
-                                 'Alert signup is currently closed. Come back after schedules have been released!')
+        return HttpResponseRedirect(reverse('index'))
 
     if request.method == 'POST':
         course_code = request.POST.get('course', None)

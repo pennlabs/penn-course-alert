@@ -54,6 +54,8 @@ def load_courses(query='', semester=None):
     for course in results:
         upsert_course_from_opendata(course, semester)
 
+    return {'result': 'succeeded', 'name': 'pca.tasks.load_courses'}
+
 
 @shared_task(name='pca.tasks.send_alert')
 def send_alert(registration):
