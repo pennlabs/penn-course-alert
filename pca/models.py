@@ -94,8 +94,8 @@ def upsert_course_from_opendata(info, semester):
     course_code = info['section_id_normalized']
     course, section = get_course_and_section(course_code, semester)
 
-    course.title = info['course_title']
-    course.description = info['course_description']
+    course.title = info['course_title'].replace('\uFFFD', '')
+    course.description = info['course_description'].replace('\uFFFD', '')
     course.save()
 
     section.is_open = info['course_status'] == 'O'
