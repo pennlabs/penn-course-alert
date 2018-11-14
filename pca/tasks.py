@@ -39,7 +39,7 @@ def generate_course_json(semester=None, use_cache=True):
         })
 
     serialized_sections = json.dumps(sections)
-    r.set('sections', serialized_sections, ex=600)
+    r.set('sections', serialized_sections)
     return sections
 
 
