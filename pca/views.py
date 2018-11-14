@@ -41,22 +41,20 @@ def register(request):
         email_address = request.POST.get('email', None)
         phone = request.POST.get('phone', None)
 
-        course, section = get_course_and_section(course_code, get_current_semester())
-        registration = Registration(section=section, email=email_address, phone=phone)
-        registration.validate_phone()
+        res = register_for_course(course_code, email_address, phone)
 
-        if Registration.objects.filter(section=section,
-                                       email=email_address,
-                                       phone=registration.phone,
-                                       notification_sent=False).exists():
+        if res == RegStatus.OPEN_REG_EXISTS:
             return homepage_with_msg(request,
                                      'warning',
-                                     "You've already registered to get alerts for %s!" % section.normalized)
-
-        registration.save()
-        return homepage_with_msg(request,
-                                 'success',
-                                 'Your registration for %s was successful!' % section.normalized)
+                                     "You've already registered to get alerts for %s!" % course_code)
+        elif res == RegStatus.SUCCESS:
+            return homepage_with_msg(request,
+                                     'success',
+                                     'Your registration for %s was successful!' % course_code)
+        else:
+            return homepage_with_msg(request,
+                                     'warning',
+                                     'There was an error on our end. Please try again!')
     else:
         raise Http404('GET not accepted')
 

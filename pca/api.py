@@ -38,6 +38,7 @@ def get_courses(query, semester):
 
     results = []
     while True:
+        print('making request for page #%d' % params['page_number'])
         data, err = make_api_request(params, headers)
         if data is not None:
             next_page = data['service_meta']['next_page_number']

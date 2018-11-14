@@ -1,4 +1,5 @@
 import json
+from enum import Enum, auto
 from urllib.parse import urlencode
 
 from django.db import models
@@ -14,7 +15,7 @@ import phonenumbers  # library for parsing and formatting phone numbers.
 
 
 def get_current_semester():
-    return get_value('SEMESTER', '2019C')
+    return get_value('SEMESTER', '2019A')
 
 
 class Instructor(models.Model):
@@ -94,6 +95,7 @@ def upsert_course_from_opendata(info, semester):
     course_code = info['section_id_normalized']
     course, section = get_course_and_section(course_code, semester)
 
+    # https://stackoverflow.com/questions/11159118/incorrect-string-value-xef-xbf-xbd-for-column
     course.title = info['course_title'].replace('\uFFFD', '')
     course.description = info['course_description'].replace('\uFFFD', '')
     course.save()
@@ -109,6 +111,13 @@ def upsert_course_from_opendata(info, semester):
         i, created = Instructor.objects.get_or_create(name=instructor['name'])
         section.instructors.add(i)
     section.save()
+
+
+class RegStatus(Enum):
+    SUCCESS = auto()
+    OPEN_REG_EXISTS = auto()
+    COURSE_OPEN = auto()
+    COURSE_NOT_FOUND = auto()
 
 
 class Registration(models.Model):
@@ -173,3 +182,18 @@ class Registration(models.Model):
                                         resubscribed_from=self)
         new_registration.save()
         return new_registration
+
+
+def register_for_course(course_code, email_address, phone):
+    course, section = get_course_and_section(course_code, get_current_semester())
+    registration = Registration(section=section, email=email_address, phone=phone)
+    registration.validate_phone()
+
+    if Registration.objects.filter(section=section,
+                                   email=email_address,
+                                   phone=registration.phone,
+                                   notification_sent=False).exists():
+        return RegStatus.OPEN_REG_EXISTS
+
+    registration.save()
+    return RegStatus.SUCCESS
