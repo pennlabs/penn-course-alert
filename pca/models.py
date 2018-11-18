@@ -1,6 +1,7 @@
 import json
 from enum import Enum, auto
 from urllib.parse import urlencode
+import logging
 
 from django.db import models
 from django.conf import settings
@@ -9,9 +10,11 @@ from django import urls
 
 from .alerts import Email, Text
 from shortener.models import shorten
-from options.models import get_value
+from options.models import get_value, get_bool
 
 import phonenumbers  # library for parsing and formatting phone numbers.
+
+logger = logging.getLogger(__name__)
 
 
 def get_current_semester():
@@ -161,9 +164,9 @@ class Registration(models.Model):
         return shorten(full_url).shortened
 
     def alert(self):
-        # TODO: Exception handling on send_alert()
         email_result = Email(self).send_alert()
         text_result = Text(self).send_alert()
+        logging.debug('NOTIFICATION SENT FOR ' + self.__str__())
         self.notification_sent = True
         self.notification_sent_at = timezone.now()
         self.save()

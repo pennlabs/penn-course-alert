@@ -76,7 +76,8 @@ def send_alert(registration):
     }
 
 
-@shared_task(name='pca.tasks.send_alerts_for')
+# current API is rate-limited to 100/minute, so only spin off a single
+@shared_task(name='pca.tasks.send_alerts_for', rate_limit='100/m')
 def send_alerts_for(section_code, registrations, semester):
     new_data = api.get_course(section_code, semester)  # THIS IS A SLOW API CALL
     course, section = get_course_and_section(section_code, semester)
