@@ -43,6 +43,16 @@ def generate_course_json(semester=None, use_cache=True):
     return sections
 
 
+@shared_task(name='pca.tasks.demo_alert')
+def demo_alert():
+    return {'result': 'executed', 'name': 'pca.tasks.demo_alert'}
+
+
+@shared_task(name='pca.tasks.demo_task')
+def demo_task():
+    return {'result': 'executed', 'name': 'pca.tasks.demo_task'}
+
+
 @shared_task(name='pca.tasks.load_courses')
 def load_courses(query='', semester=None):
     if semester is None:

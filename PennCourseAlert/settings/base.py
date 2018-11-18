@@ -154,6 +154,8 @@ task_routes = {
     'pca.tasks.load_courses': 'default',
     'pca.tasks.prepare_alerts': 'default',
     'pca.tasks.send_alerts_for': 'default',
+    'pca.tasks.demo_task': 'default',
+    'pca.tasks.demo_alert': 'alerts',
     'pca.tasks.send_alert': 'alerts',  # run alerts off a different queue so we can SCALE
 }
 
