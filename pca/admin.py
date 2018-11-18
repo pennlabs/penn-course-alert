@@ -10,9 +10,10 @@ from .models import *
 class RegistrationAdmin(admin.ModelAdmin):
     readonly_fields = ('section_link',)
     search_fields = ('email', 'phone', 'section__course__department', 'section__course__code', 'section__code')
+    autocomplete_fields = ('section', )
 
     def section_link(self, instance):
-        link = reverse('admin:pca_section_change', args=[instance.id])
+        link = reverse('admin:pca_section_change', args=[instance.section.id])
         return format_html('<a href="{}">{}</a>', link, instance.section.__str__())
 
 
@@ -23,10 +24,10 @@ class CourseAdmin(admin.ModelAdmin):
 class SectionAdmin(admin.ModelAdmin):
     search_fields = ('course__department', 'course__code', 'code', 'course__semester')
     readonly_fields = ('course_link',)
-    autocomplete_fields = ('instructors', )
+    autocomplete_fields = ('instructors', 'course')
 
     def course_link(self, instance):
-        link = reverse('admin:pca_course_change', args=[instance.id])
+        link = reverse('admin:pca_course_change', args=[instance.course.id])
         return format_html('<a href="{}">{}</a>', link, instance.course.__str__())
 
 
