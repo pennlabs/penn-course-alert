@@ -68,8 +68,9 @@ def load_courses(query='', semester=None):
 
 
 @shared_task(name='pca.tasks.send_alert')
-def send_alert(registration):
-    result = registration.alert()
+def send_alert(reg_id):
+    print("id: " + str(reg_id))
+    result = Registration.objects.get(id=reg_id).alert()
     return {
         'result': result,
         'task': 'pca.tasks.send_alert'
@@ -80,14 +81,15 @@ def send_alert(registration):
 @shared_task(name='pca.tasks.send_alerts_for', rate_limit='100/m')
 def send_alerts_for(section_code, registrations, semester):
     new_data = api.get_course(section_code, semester)  # THIS IS A SLOW API CALL
-    course, section = get_course_and_section(section_code, semester)
+    _, section = get_course_and_section(section_code, semester)
     was_open = section.is_open
     if new_data is not None:
         upsert_course_from_opendata(new_data, semester)
-        now_open = section.is_open
+        now_open = is_section_open(new_data)
+        print("was_open:" + str(was_open) + " | now_open:"+str(now_open))
         if now_open and not was_open:  # is this python or pseudocode ;)?
-            for reg in registrations:
-                send_alert.delay(reg)  # This is a
+            for reg_id in registrations:
+                send_alert.delay(reg_id)  # This is a
 
 
 @shared_task(name='pca.tasks.prepare_alerts')
@@ -103,9 +105,9 @@ def prepare_alerts(semester=None):
         # Group registrations into buckets based on their associated section
         sect = reg.section.normalized
         if sect in alerts:
-            alerts[sect].append(reg)
+            alerts[sect].append(reg.id)
         else:
-            alerts[sect] = [reg]
+            alerts[sect] = [reg.id]
 
     for section_code, registrations in alerts.items():
         send_alerts_for.delay(section_code, registrations, semester)

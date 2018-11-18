@@ -94,6 +94,10 @@ def get_course_and_section(course_code, semester):
     return course, section
 
 
+def is_section_open(info):
+    return info['course_status'] == 'O'
+
+
 def upsert_course_from_opendata(info, semester):
     course_code = info['section_id_normalized']
     course, section = get_course_and_section(course_code, semester)
@@ -137,6 +141,7 @@ class Registration(models.Model):
 
     # track resubscriptions
     resubscribed_from = models.OneToOneField('Registration',
+                                             blank=True,
                                              null=True,
                                              on_delete=models.SET_NULL,
                                              related_name='resubscribed_to')
