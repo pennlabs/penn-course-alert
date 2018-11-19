@@ -175,6 +175,21 @@ class RegisterTestCase(TestCase):
         self.assertEqual(RegStatus.SUCCESS, res)
         self.assertEqual(2, len(Registration.objects.all()))
 
+    def test_justemail(self):
+        res = register_for_course(self.sections[0].normalized, 'e@example.com', None)
+        self.assertEqual(RegStatus.SUCCESS, res)
+        self.assertEqual(1, len(Registration.objects.all()))
+
+    def test_justphone(self):
+        res = register_for_course(self.sections[0].normalized, None, '5555555555')
+        self.assertEqual(RegStatus.SUCCESS, res)
+        self.assertEqual(1, len(Registration.objects.all()))
+
+    def test_nocontact(self):
+        res = register_for_course(self.sections[0].normalized, None, None)
+        self.assertEqual(RegStatus.NO_CONTACT_INFO, res)
+        self.assertEqual(0, len(Registration.objects.all()))
+
 
 class ResubscribeTestCase(TestCase):
     def setUp(self):

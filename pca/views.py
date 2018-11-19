@@ -43,14 +43,18 @@ def register(request):
 
         res = register_for_course(course_code, email_address, phone)
 
-        if res == RegStatus.OPEN_REG_EXISTS:
-            return homepage_with_msg(request,
-                                     'warning',
-                                     "You've already registered to get alerts for %s!" % course_code)
-        elif res == RegStatus.SUCCESS:
+        if res == RegStatus.SUCCESS:
             return homepage_with_msg(request,
                                      'success',
                                      'Your registration for %s was successful!' % course_code)
+        elif res == RegStatus.OPEN_REG_EXISTS:
+            return homepage_with_msg(request,
+                                     'warning',
+                                     "You've already registered to get alerts for %s!" % course_code)
+        elif res == RegStatus.NO_CONTACT_INFO:
+            return homepage_with_msg(request,
+                                     'danger',
+                                     'Please enter either a phone number or an email address.')
         else:
             return homepage_with_msg(request,
                                      'warning',

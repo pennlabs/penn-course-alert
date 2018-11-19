@@ -125,6 +125,7 @@ class RegStatus(Enum):
     OPEN_REG_EXISTS = auto()
     COURSE_OPEN = auto()
     COURSE_NOT_FOUND = auto()
+    NO_CONTACT_INFO = auto()
 
 
 class Registration(models.Model):
@@ -205,6 +206,8 @@ class Registration(models.Model):
 
 
 def register_for_course(course_code, email_address, phone):
+    if not email_address and not phone:
+        return RegStatus.NO_CONTACT_INFO
     course, section = get_course_and_section(course_code, get_current_semester())
     registration = Registration(section=section, email=email_address, phone=phone)
     registration.validate_phone()
