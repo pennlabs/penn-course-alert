@@ -4,6 +4,9 @@ from .base import *  # noqa
 # Disable Django's own staticfiles handling in favour of WhiteNoise, for
 # greater consistency between gunicorn and `./manage.py runserver`. See:
 # http://whitenoise.evans.io/en/stable/django.html#using-whitenoise-in-development
+
+BASE_URL = 'https://penncoursealert.com'
+
 INSTALLED_APPS.remove('django.contrib.staticfiles')
 INSTALLED_APPS.extend([
     'whitenoise.runserver_nostatic',

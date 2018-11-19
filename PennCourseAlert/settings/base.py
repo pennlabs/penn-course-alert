@@ -130,12 +130,7 @@ API_KEY = os.environ.get('API_KEY', '')
 API_SECRET = os.environ.get('API_SECRET', '')
 API_URL = 'https://esb.isc-seo.upenn.edu/8091/open_data/course_section_search'
 
-ENV = os.environ.get('PCA_ENV', 'dev')
-
-if ENV == 'prod':
-    BASE_URL = 'http://penncoursealert.com'
-else:
-    BASE_URL = 'http://localhost:8000'
+BASE_URL = 'https://penncoursealert.com'
 
 SMTP_HOST = os.environ.get('SMTP_HOST', 'email-smtp.us-east-1.amazonaws.com')
 SMTP_PORT = os.environ.get('SMTP_PORT', 587)
