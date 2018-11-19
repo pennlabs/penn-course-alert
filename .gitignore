@@ -4,3 +4,4 @@
 .env
 celerybeat-schedule
 celerybeat.pid
+test-results/

@@ -18,6 +18,7 @@ django-celery-beat = "*"
 django-celery-results = "*"
 gunicorn = "*"
 whitenoise = "*"
+unittest-xml-reporting = "*"
 
 [dev-packages]
 
