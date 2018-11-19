@@ -50,7 +50,7 @@ jobs:
             - "/usr/local/lib/python3.6/site-packages"
       - run:
           command: |
-            pipenv run python manage.py test --settings=PennCourseAlert.settings.test
+            pipenv run python manage.py test --settings=PennCourseAlert.settings.ci
       - store_test_results:
           path: test-results
       - store_artifacts:

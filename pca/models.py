@@ -178,16 +178,28 @@ class Registration(models.Model):
         return email_result is not None and text_result is not None  # True if no error in email/text.
 
     def resubscribe(self):
-        r = self
-        while hasattr(r, 'resubscribed_to'):  # follow the chain of resubscriptions to the most recent one.
-            r = r.resubscribed_to
-        if not r.notification_sent:  # if a notification hasn't been sent on this recent one,
-            return self  # don't create duplicate registrations for no reason.
+        """
+        Resubscribe for notifications. If the registration this is called on
+        has had its notification sent, a new registration is made. If it hasn't,
+        return the most recent registration in the resubscription chain which hasn't
+        been used yet.
+
+        Resubscription is idempotent. No matter how many times you call it (without
+        alert() being called on the registration), only one Registration model will
+        be created.
+        :return: Registration object for the resubscription
+        """
+        most_recent_reg = self
+        while hasattr(most_recent_reg, 'resubscribed_to'):  # follow the chain of resubscriptions to the most recent one.
+            most_recent_reg = most_recent_reg.resubscribed_to
+
+        if not most_recent_reg.notification_sent:  # if a notification hasn't been sent on this recent one,
+            return most_recent_reg  # don't create duplicate registrations for no reason.
 
         new_registration = Registration(email=self.email,
                                         phone=self.phone,
                                         section=self.section,
-                                        resubscribed_from=self)
+                                        resubscribed_from=most_recent_reg)
         new_registration.save()
         return new_registration
 
