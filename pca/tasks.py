@@ -77,29 +77,27 @@ def send_alert(reg_id):
     }
 
 
-# current API is rate-limited to 100/minute, so only spin off a single
-@shared_task(name='pca.tasks.send_alerts_for', rate_limit='100/m')
-def send_alerts_for(section_code, registrations, semester):
+def should_send_alert(section_code, semester):
     new_data = api.get_course(section_code, semester)  # THIS IS A SLOW API CALL
     _, section = get_course_and_section(section_code, semester)
     was_open = section.is_open
-    if new_data is not None:
+    if new_data is not None:  # If we recieved data from the API
         upsert_course_from_opendata(new_data, semester)
         now_open = is_section_open(new_data)
-        print("was_open:" + str(was_open) + " | now_open:"+str(now_open))
-        if now_open and not was_open:  # is this python or pseudocode ;)?
-            for reg_id in registrations:
-                send_alert.delay(reg_id)  # This is a
+        return now_open and not was_open
+    else:
+        return False
 
 
-@shared_task(name='pca.tasks.prepare_alerts')
-def prepare_alerts(semester=None):
-    if semester is None:
-        semester = get_value('SEMESTER')
+# current API is rate-limited to 100/minute, so only spin off a single
+@shared_task(name='pca.tasks.send_alerts_for', rate_limit='100/m')
+def send_alerts_for(section_code, registrations, semester):
+    if should_send_alert(section_code, semester):
+        for reg_id in registrations:
+            send_alert.delay(reg_id)
 
-    if not get_bool('SEND_ALERTS', False):
-        return {'task': 'pca.tasks.prepare_alerts', 'result': 'aborted -- SEND_ALERTS=False'}
 
+def collect_registrations(semester):
     alerts = {}
     for reg in Registration.objects.filter(section__course__semester=semester, notification_sent=False):
         # Group registrations into buckets based on their associated section
@@ -108,8 +106,15 @@ def prepare_alerts(semester=None):
             alerts[sect].append(reg.id)
         else:
             alerts[sect] = [reg.id]
+    return alerts
 
-    for section_code, registrations in alerts.items():
+
+@shared_task(name='pca.tasks.prepare_alerts')
+def prepare_alerts(semester=None):
+    if semester is None:
+        semester = get_value('SEMESTER')
+
+    for section_code, registrations in collect_registrations(semester).items():
         send_alerts_for.delay(section_code, registrations, semester)
 
     return {'task': 'pca.tasks.prepare_alerts', 'result': 'complete'}

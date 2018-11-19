@@ -1,0 +1,171 @@
+{
+    "activity": "LEC",
+    "activity_description": "Lecture",
+    "corequisite_activity": "",
+    "corequisite_activity_description": "",
+    "course_department": "CIS",
+    "course_description": "What are the basic mathematical concepts and techniques needed in computer science? This course provides an introduction to proof principles and logics, functions and relations, induction principles, combinatorics and graph theory, as well as a rigorous grounding in writing and reading mathematical proofs.",
+    "course_description_url": "",
+    "course_meeting_message": "",
+    "course_notes": "",
+    "course_notes_message": "",
+    "course_number": "160",
+    "course_status": "O",
+    "course_status_normalized": "Open",
+    "course_status_reason_code": "",
+    "course_terms_offered": "Course usually offered in spring term",
+    "course_title": "Mathematical Foundations of Computer Science",
+    "credit_and_grade_type": "1 CU",
+    "credit_connector": "F",
+    "credit_type": "CU",
+    "credits": "1 CU",
+    "crosslist_primary": "",
+    "crosslistings": [],
+    "department_description": "Computer and Information Sci",
+    "department_url": "http://www.cis.upenn.edu/grad",
+    "end_date": "2019-05-01T04:00:00Z",
+    "first_meeting_days": "TR09:00 AMLEVH101",
+    "fulfills_college_requirements": [],
+    "grade_type": "",
+    "important_notes": [
+        "Registration also required for Recitation (see below)"
+    ],
+    "instructors": [
+        {
+            "name": "Val Breazu Tannen",
+            "section_id": "CIS 160001",
+            "term": "2019A"
+        }
+    ],
+    "is_cancelled": false,
+    "is_closed": false,
+    "is_crosslist_primary": false,
+    "is_not_scheduled": false,
+    "is_special_session": false,
+    "labs": [],
+    "lectures": [],
+    "max_enrollment": "130",
+    "max_enrollment_crosslist": "130",
+    "maximum_credit": "1",
+    "meetings": [
+        {
+            "building_code": "",
+            "building_name": "",
+            "end_hour_24": 10,
+            "end_minutes": 30,
+            "end_time": "10:30 AM",
+            "end_time_24": 10.3,
+            "meeting_days": "TR",
+            "room_number": "",
+            "section_id": "CIS 160001",
+            "section_id_normalized": "CIS -160-001",
+            "start_hour_24": 9,
+            "start_minutes": 0,
+            "start_time": "09:00 AM",
+            "start_time_24": 9,
+            "term": "2019A"
+        }
+    ],
+    "minimum_credit": "1",
+    "prerequisite_notes": [],
+    "primary_instructor": "",
+    "recitations": [
+        {
+            "course_id": "160",
+            "section_id": "201",
+            "subject": "CIS"
+        },
+        {
+            "course_id": "160",
+            "section_id": "202",
+            "subject": "CIS"
+        },
+        {
+            "course_id": "160",
+            "section_id": "203",
+            "subject": "CIS"
+        },
+        {
+            "course_id": "160",
+            "section_id": "204",
+            "subject": "CIS"
+        },
+        {
+            "course_id": "160",
+            "section_id": "205",
+            "subject": "CIS"
+        },
+        {
+            "course_id": "160",
+            "section_id": "206",
+            "subject": "CIS"
+        },
+        {
+            "course_id": "160",
+            "section_id": "207",
+            "subject": "CIS"
+        },
+        {
+            "course_id": "160",
+            "section_id": "208",
+            "subject": "CIS"
+        },
+        {
+            "course_id": "160",
+            "section_id": "209",
+            "subject": "CIS"
+        },
+        {
+            "course_id": "160",
+            "section_id": "210",
+            "subject": "CIS"
+        },
+        {
+            "course_id": "160",
+            "section_id": "211",
+            "subject": "CIS"
+        },
+        {
+            "course_id": "160",
+            "section_id": "212",
+            "subject": "CIS"
+        },
+        {
+            "course_id": "160",
+            "section_id": "213",
+            "subject": "CIS"
+        },
+        {
+            "course_id": "160",
+            "section_id": "214",
+            "subject": "CIS"
+        },
+        {
+            "course_id": "160",
+            "section_id": "215",
+            "subject": "CIS"
+        }
+    ],
+    "requirements": [
+        {
+            "argument": "",
+            "registration_control_code": "CA",
+            "requirement_description": "Section Activity Co-Requisite Required",
+            "section_id": "CIS 160001",
+            "term": "2019A",
+            "value": "REC",
+            "value_normalized": "Recitation"
+        }
+    ],
+    "requirements_title": "Associated recitations",
+    "section_id": "CIS 160001",
+    "section_id_normalized": "CIS -160-001",
+    "section_number": "001",
+    "section_title": "Math Found Comp Sci",
+    "start_date": "2019-01-16T05:00:00Z",
+    "syllabus_url": "",
+    "term": "2019A",
+    "term_normalized": "Spring 2019",
+    "term_session": "",
+    "third_party_links": []
+}
