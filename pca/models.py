@@ -147,7 +147,7 @@ class Registration(models.Model):
                                              related_name='resubscribed_to')
 
     def __str__(self):
-        return '%s: %s' % (self.email, self.section.__str__())
+        return '%s: %s' % (self.email or self.phone, self.section.__str__())
 
     def validate_phone(self):
         """Store phone numbers in the format recommended by Twilio."""
