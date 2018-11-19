@@ -128,6 +128,10 @@ STATIC_ROOT = os.path.join(PROJECT_DIR, 'static')
 
 API_KEY = os.environ.get('API_KEY', '')
 API_SECRET = os.environ.get('API_SECRET', '')
+
+API_KEY_SECONDARY = os.environ.get('API_KEY_SECONDARY', '')
+API_SECRET_SECONDARY = os.environ.get('API_SECRET_SECONDARY', '')
+
 API_URL = 'https://esb.isc-seo.upenn.edu/8091/open_data/course_section_search'
 
 BASE_URL = 'https://penncoursealert.com'

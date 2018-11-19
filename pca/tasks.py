@@ -77,6 +77,13 @@ def send_alert(reg_id):
     }
 
 
+@shared_task(name='pca.tasks.update_course_info', rate_limit='100/m')
+def update_course_info(section_code, semester):
+    data = api.get_course(section_code, semester, False)  # use the secondary api
+    if data is not None:
+        upsert_course_from_opendata(data, semester)
+
+
 def should_send_alert(section_code, semester):
     new_data = api.get_course(section_code, semester)  # THIS IS A SLOW API CALL
     _, section = get_course_and_section(section_code, semester)
@@ -84,7 +91,10 @@ def should_send_alert(section_code, semester):
     if new_data is not None:  # If we recieved data from the API
         upsert_course_from_opendata(new_data, semester)
         now_open = is_section_open(new_data)
-        return now_open and not was_open
+        # if we were using perpetual notifications, would have to do "return now_open and not was_open".
+        # but without that, we should just send a notification every time a course is open and we have a notification
+        # to do. because notifications are IDEMPOTENT
+        return now_open
     else:
         return False
 

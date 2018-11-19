@@ -18,8 +18,8 @@ class SendAlertTestCase(TestCase):
 
         self.r.save()
 
-    @patch('pca.models.Email.send_alert')
     @patch('pca.models.Text.send_alert')
+    @patch('pca.models.Email.send_alert')
     def test_send_alert(self, mock_email, mock_text):
         self.assertFalse(Registration.objects.get(id=self.r.id).notification_sent)
         tasks.send_alert(self.r.id)
@@ -56,7 +56,8 @@ class SendAlertsForSectionTestCase(TestCase):
         self.assert_should_send(mock_get, False, True, True)
 
     def test_open_then_open(self, mock_get):
-        self.assert_should_send(mock_get, True, True, False)
+        # was_open shouldn't have an effect on sending without perpetual notifications
+        self.assert_should_send(mock_get, True, True, True)
 
 
 class CollectRegistrationTestCase(TestCase):
@@ -112,12 +113,21 @@ class CollectRegistrationTestCase(TestCase):
 
     def test_two_registrations_same_section(self):
         r1 = Registration(email='e@example.com', section=self.sections[0])
-        r2 = Registration(email='e@example.com', section=self.sections[0])
+        r2 = Registration(email='v@example.com', section=self.sections[0])
         r1.save()
         r2.save()
         result = tasks.collect_registrations('2019A')
         self.assertEqual(1, len(result))
         self.assertTrue(contains_all([r1.id, r2.id], result[self.sections[0].normalized]))
+
+    def test_only_unused_registrations(self):
+        r1 = Registration(email='e@example.com', section=self.sections[0])
+        r2 = Registration(email='v@example.com', section=self.sections[0], notification_sent=True)
+        r1.save()
+        r2.save()
+        result = tasks.collect_registrations('2019A')
+        self.assertEqual(1, len(result))
+        self.assertTrue(contains_all([r1.id], result[self.sections[0].normalized]))
 
 
 class RegisterTestCase(TestCase):

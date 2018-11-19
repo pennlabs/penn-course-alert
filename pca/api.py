@@ -1,18 +1,20 @@
 import requests
+import logging
 
 from django.conf import settings
+logger = logging.getLogger(__name__)
 
 
-def get_headers():
+def get_headers(primary=True):
     """This will have a rotation of API keys eventually"""
     return {
         'Content-Type': 'application/json; charset=utf-8',
-        'Authorization-Bearer': settings.API_KEY,
-        'Authorization-Token': settings.API_SECRET
+        'Authorization-Bearer': settings.API_KEY if primary else settings.API_KEY_SECONDARY,
+        'Authorization-Token': settings.API_SECRET if primary else settings.API_SECRET_SECONDARY
     }
 
 
-def make_api_request(params, headers=None):
+def make_api_request(params, headers):
     if headers is None:
         headers = get_headers()
 
@@ -23,7 +25,7 @@ def make_api_request(params, headers=None):
     if r.status_code == requests.codes.ok:
         return r.json(), None
     else:
-        return None, r.text()
+        return None, r.text
 
 
 def get_courses(query, semester):
@@ -38,7 +40,7 @@ def get_courses(query, semester):
 
     results = []
     while True:
-        print('making request for page #%d' % params['page_number'])
+        logger.info('making request for page #%d' % params['page_number'])
         data, err = make_api_request(params, headers)
         if data is not None:
             next_page = data['service_meta']['next_page_number']
@@ -47,7 +49,7 @@ def get_courses(query, semester):
                 break
             params['page_number'] = next_page
         else:
-            print(err)  # log API error
+            logger.error(err)  # log API error
             break
 
     return results
@@ -58,13 +60,15 @@ def first(lst):
         return lst[0]
 
 
-def get_course(query, semester):
+def get_course(query, semester, primary=True):
     params = {
         'course_id': query,
         'term': semester
     }
-    data, err = make_api_request(params)
-    if data is not None:
+    headers = get_headers(primary)
+    data, err = make_api_request(params, headers)
+    if err is None and data is not None:
         return first(data['result_data'])
     else:
-        print(err)
+        logger.error(err)
+        return None
