@@ -8,7 +8,7 @@ from .models import *
 
 
 class RegistrationAdmin(admin.ModelAdmin):
-    readonly_fields = ('section_link', 'resubscribed_from')
+    readonly_fields = ('section_link', 'resubscribed_from', 'created_at')
     search_fields = ('email', 'phone', 'section__course__department', 'section__course__code', 'section__code')
     autocomplete_fields = ('section', )
 
