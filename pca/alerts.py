@@ -1,11 +1,15 @@
 from abc import ABC, abstractmethod
-from smtplib import SMTP
+from smtplib import SMTP, SMTPRecipientsRefused
 from email.mime.text import MIMEText
+import logging
 
 from django.template import loader
 from django.conf import settings
 
 from twilio.rest import Client
+from twilio.base.exceptions import TwilioRestException
+
+logger = logging.getLogger(__name__)
 
 
 def send_email(from_, to, subject, html):
@@ -45,11 +49,14 @@ class Email(Alert):
     def send_alert(self):
         if self.registration.email is None:
             return False
-
-        return send_email(from_='Penn Course Alert <team@penncoursealert.com>',
-                          to=self.registration.email,
-                          subject='%s is now open!' % self.registration.section.normalized,
-                          html=self.text)
+        try:
+            return send_email(from_='Penn Course Alert <team@penncoursealert.com>',
+                              to=self.registration.email,
+                              subject='%s is now open!' % self.registration.section.normalized,
+                              html=self.text)
+        except SMTPRecipientsRefused:
+            logger.exception('Email Error')
+            return False
 
 
 class Text(Alert):
@@ -60,12 +67,15 @@ class Text(Alert):
         if self.registration.phone is None:
             return False
 
-        client = Client(settings.TWILIO_SID, settings.TWILIO_AUTH_TOKEN)
-        msg = client.messages.create(
-            to=self.registration.phone,
-            from_=settings.TWILIO_NUMBER,
-            body=self.text
-        )
-        if msg.sid is not None:
-            return True
-
+        try:
+            client = Client(settings.TWILIO_SID, settings.TWILIO_AUTH_TOKEN)
+            msg = client.messages.create(
+                to=self.registration.phone,
+                from_=settings.TWILIO_NUMBER,
+                body=self.text
+            )
+            if msg.sid is not None:
+                return True
+        except TwilioRestException:
+            logger.exception('Text Error')
+            return False

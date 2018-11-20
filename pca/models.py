@@ -172,12 +172,8 @@ class Registration(models.Model):
         return shorten(full_url).shortened
 
     def alert(self):
-        email_result = None
         text_result = Text(self).send_alert()
-        try:
-            email_result = Email(self).send_alert()
-        except SMTPRecipientsRefused:
-            logger.exception("SMTP RecipientsRefused Error")
+        email_result = Email(self).send_alert()
         logging.debug('NOTIFICATION SENT FOR ' + self.__str__())
         self.notification_sent = True
         self.notification_sent_at = timezone.now()
