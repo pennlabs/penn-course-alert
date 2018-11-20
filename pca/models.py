@@ -2,6 +2,8 @@ import json
 from enum import Enum, auto
 from urllib.parse import urlencode
 import logging
+from smtplib import SMTPRecipientsRefused
+
 
 from django.db import models
 from django.conf import settings
@@ -170,8 +172,11 @@ class Registration(models.Model):
         return shorten(full_url).shortened
 
     def alert(self):
-        email_result = Email(self).send_alert()
         text_result = Text(self).send_alert()
+        try:
+            email_result = Email(self).send_alert()
+        except SMTPRecipientsRefused:
+            logger.exception("SMTP RecipientsRefused Error")
         logging.debug('NOTIFICATION SENT FOR ' + self.__str__())
         self.notification_sent = True
         self.notification_sent_at = timezone.now()
