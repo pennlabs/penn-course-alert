@@ -69,7 +69,6 @@ def load_courses(query='', semester=None):
 
 @shared_task(name='pca.tasks.send_alert')
 def send_alert(reg_id):
-    print("id: " + str(reg_id))
     result = Registration.objects.get(id=reg_id).alert()
     return {
         'result': result,

@@ -9,6 +9,8 @@ def contains_all(l1, l2):
     return len(l1) == len(l2) and sorted(l1) == sorted(l2)
 
 
+@patch('pca.models.Text.send_alert')
+@patch('pca.models.Email.send_alert')
 class SendAlertTestCase(TestCase):
     def setUp(self):
         course, section = get_course_and_section('CIS-160-001', '2019A')
@@ -18,14 +20,26 @@ class SendAlertTestCase(TestCase):
 
         self.r.save()
 
-    @patch('pca.models.Text.send_alert')
-    @patch('pca.models.Email.send_alert')
     def test_send_alert(self, mock_email, mock_text):
         self.assertFalse(Registration.objects.get(id=self.r.id).notification_sent)
         tasks.send_alert(self.r.id)
         self.assertTrue(mock_email.called)
         self.assertTrue(mock_text.called)
         self.assertTrue(Registration.objects.get(id=self.r.id).notification_sent)
+
+    def test_dont_resend_alert(self, mock_email, mock_text):
+        self.r.notification_sent = True
+        self.r.save()
+        tasks.send_alert(self.r.id)
+        self.assertFalse(mock_email.called)
+        self.assertFalse(mock_text.called)
+
+    def test_resend_alert_forced(self, mock_email, mock_text):
+        self.r.notification_sent = True
+        self.r.save()
+        self.r.alert(True)
+        self.assertTrue(mock_email.called)
+        self.assertTrue(mock_text.called)
 
 
 @patch('pca.tasks.api.get_course')

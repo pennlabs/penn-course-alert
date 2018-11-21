@@ -171,14 +171,17 @@ class Registration(models.Model):
         full_url = '%s%s' % (settings.BASE_URL, urls.reverse('resubscribe', kwargs={'id_': self.id}))
         return shorten(full_url).shortened
 
-    def alert(self):
-        text_result = Text(self).send_alert()
-        email_result = Email(self).send_alert()
-        logging.debug('NOTIFICATION SENT FOR ' + self.__str__())
-        self.notification_sent = True
-        self.notification_sent_at = timezone.now()
-        self.save()
-        return email_result is not None and text_result is not None  # True if no error in email/text.
+    def alert(self, forced=False):
+        if forced or not self.notification_sent:
+            text_result = Text(self).send_alert()
+            email_result = Email(self).send_alert()
+            logging.debug('NOTIFICATION SENT FOR ' + self.__str__())
+            self.notification_sent = True
+            self.notification_sent_at = timezone.now()
+            self.save()
+            return email_result is not None and text_result is not None  # True if no error in email/text.
+        else:
+            return False
 
     def resubscribe(self):
         """
