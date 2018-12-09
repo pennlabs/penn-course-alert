@@ -37,7 +37,7 @@ CJFblaXvAAAAAElFTkSuQmCC"/>
       body {
         background-color: #fafcff;
         position: relative;
-        padding-bottom: 150px;
+        {#padding-bottom: 150px;#}
       }
       .tt-menu {
         width: 100%;
@@ -73,9 +73,11 @@ CJFblaXvAAAAAElFTkSuQmCC"/>
       .footer {
         background-color: #ffffff;
         box-shadow: 0px 0px 8px 1px #F1F3F6;
-        position: absolute;
-        width: 100%;
-        bottom: 0px;
+        max-height: 9rem;
+        min-height: 9rem;
+      }
+      #main {
+          min-height: calc(100vh - 9rem);
       }
 
       .title, .subtitle, p, label {
@@ -102,7 +104,7 @@ CJFblaXvAAAAAElFTkSuQmCC"/>
   {{ notification.text }}
   </div>
   {% endif %}
-    <section class="section is-block-mobile">
+    <section class="section is-block-mobile" id="main">
       <div class="container has-text-centered">
         <div class="level" style="margin-bottom:0.5rem">
           <div class="level-item">
@@ -173,18 +175,14 @@ CJFblaXvAAAAAElFTkSuQmCC"/>
         </div>
     </body>
 
-    <footer class="footer">
-      <div class="container">
-        <div class="content has-text-centered">
-          <p style="font-size:0.8rem">
-          Made with <span class="icon is-small" style="color:#F56F71"><i class="fa fa-heart"></i></span> by <a href="http://pennlabs.org" target="_blank">Penn Labs</a>
-          </p>
-          <p style="font-size:0.8rem">
-              Have questions, comments or bugs? <a href="https://airtable.com/shrGtPbDUYkHxn5Nm">Leave us feedback here!</a>
-          </p>
-        </div>
-      </div>
-    </footer>
+    <div class="footer has-text-centered">
+      <p style="font-size:0.8rem">
+      Made with <span class="icon is-small" style="color:#F56F71"><i class="fa fa-heart"></i></span> by <a href="http://pennlabs.org" target="_blank">Penn Labs</a>
+      </p>
+      <p style="font-size:0.8rem">
+          Have questions, comments or bugs? <a href="https://airtable.com/shrGtPbDUYkHxn5Nm">Leave us feedback here!</a>
+      </p>
+    </div>
 
     <script type="text/javascript" src="{% static "pca/jquery.min.js" %}"></script>
     <script type="text/javascript" src="{% static "pca/typeahead.bundle.js"%}"></script>
