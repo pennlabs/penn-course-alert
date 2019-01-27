@@ -1,5 +1,6 @@
 import requests
 import logging
+import json
 
 from django.conf import settings
 logger = logging.getLogger(__name__)
@@ -28,6 +29,14 @@ def make_api_request(params, headers):
         return None, r.text
 
 
+def report_api_error(err):
+    try:
+        msg = json.loads(err)
+        logger.error(msg.get('service_meta', {}).get('error_text', 'no error text'))
+    except json.JSONDecodeError:
+        logger.error('Penn API error', extra={'error_msg': err})
+
+
 def get_courses(query, semester):
     headers = get_headers()
 
@@ -49,7 +58,7 @@ def get_courses(query, semester):
                 break
             params['page_number'] = next_page
         else:
-            logger.error(err)  # log API error
+            report_api_error(err)
             break
 
     return results
@@ -70,5 +79,5 @@ def get_course(query, semester, primary=True):
     if err is None and data is not None:
         return first(data['result_data'])
     else:
-        logger.error(err)
+        report_api_error(err)
         return None
