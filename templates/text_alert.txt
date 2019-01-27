@@ -1,1 +1,1 @@
-PSYC-006-202 is now open! Register on PennInTouch: http://tiny.cc/lmk. Resubscribe at https://penncoursealert.com/s/49503 - Thanks for using Penn Course Alert!
+{{course}} is now open! Register on PennInTouch: http://tiny.cc/lmk. Resubscribe at {{signup_url}} - Thanks for using Penn Course Alert!
