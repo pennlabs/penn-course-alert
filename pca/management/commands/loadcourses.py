@@ -22,4 +22,4 @@ class Command(BaseCommand):
         semester = options['semester'].split('=')[-1]
         query = options['query'].split('=')[-1]
 
-        load_courses.delay(query, semester)
+        load_courses(query, semester)
