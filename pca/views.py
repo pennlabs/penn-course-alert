@@ -95,12 +95,6 @@ def alert_for_course(c_id, sent_by):
 
 
 def accept_webhook(request):
-    if request.method != 'POST':
-        return HttpResponse('Methods other than POST are not allowed', status=405)
-
-    if 'json' not in request.content_type.lower():
-        return HttpResponse('Request expected in JSON', status=415)
-
     app_id = request.META.get('Authorization-Bearer', request.META.get('HTTP_AUTHORIZATION_BEARER'))
     app_secret = request.META.get('Authorization-Token', request.META.get('HTTP_AUTHORIZATION_TOKEN'))
 
@@ -109,6 +103,12 @@ def accept_webhook(request):
         return HttpResponse('''Your credentials cannot be verified. 
         They should be placed in the header as &quot;Authorization-Bearer&quot;,  
         YOUR_APP_ID and &quot;Authorization-Token&quot; , YOUR_TOKEN"''', status=401)
+
+    if request.method != 'POST':
+        return HttpResponse('Methods other than POST are not allowed', status=405)
+
+    if 'json' not in request.content_type.lower():
+        return HttpResponse('Request expected in JSON', status=415)
 
     data = json.loads(request.body)
     course_id_normalized = normalize_course_id(data['result_data'][0]['course_section'])
