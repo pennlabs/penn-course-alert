@@ -1,12 +1,8 @@
-import base64
-import redis
 import re
-import json
 
 from django.shortcuts import render
 from django.http import HttpResponseRedirect, JsonResponse, Http404, HttpResponse
 from django.urls import reverse
-from django.template import loader
 
 from .models import *
 from .tasks import generate_course_json, send_course_alerts
@@ -117,5 +113,8 @@ def accept_webhook(request):
     data = json.loads(request.body)
     course_id_normalized = normalize_course_id(data['result_data'][0]['course_section'])
 
-    alert_for_course(course_id_normalized)
-    return JsonResponse({'message': 'success'})
+    if get_bool('SEND_FROM_WEBHOOK', False):
+        alert_for_course(course_id_normalized)
+        return JsonResponse({'message': 'webhook recieved, alerts sent'})
+    else:
+        return JsonResponse({'message': 'webhook recieved'})

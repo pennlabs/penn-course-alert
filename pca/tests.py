@@ -2,13 +2,14 @@ import json
 from unittest.mock import Mock, patch
 
 from django.test import TestCase, Client
+from django.urls import reverse
 
 from pca import tasks
 from pca.models import *
-
+from options.models import *
 
 TEST_SEMESTER = '2019A'
-from django.urls import reverse
+
 
 def contains_all(l1, l2):
     return len(l1) == len(l2) and sorted(l1) == sorted(l2)
@@ -353,15 +354,30 @@ class WebhookViewTestCase(TestCase):
 
             }
         }
+        Option.objects.update_or_create(key='SEND_FROM_WEBHOOK', value_type='BOOL', defaults={'value': 'TRUE'})
 
-    def test_alert_called(self, mock_alert):
-        self.client.post(
+    def test_alert_called_and_sent(self, mock_alert):
+        res = self.client.post(
             reverse('webhook'),
             data=json.dumps(self.body),
             content_type='application/json',
             **self.headers)
 
+        self.assertEqual(200, res.status_code)
         self.assertTrue(mock_alert.called)
+        self.assertTrue('sent' in json.loads(res.content)['message'])
+
+    def test_alert_called_not_sent(self, mock_alert):
+        Option.objects.update_or_create(key='SEND_FROM_WEBHOOK', value_type='BOOL', defaults={'value': 'FALSE'})
+        res = self.client.post(
+            reverse('webhook'),
+            data=json.dumps(self.body),
+            content_type='application/json',
+            **self.headers)
+
+        self.assertEqual(200, res.status_code)
+        self.assertFalse('sent' in json.loads(res.content)['message'])
+        self.assertFalse(mock_alert.called)
 
     def test_wrong_method(self, mock_alert):
         res = self.client.get(reverse('webhook'), **self.headers)
