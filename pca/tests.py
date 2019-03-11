@@ -1,8 +1,14 @@
-from django.test import TestCase
+import json
 from unittest.mock import Mock, patch
+
+from django.test import TestCase, Client
+from django.urls import reverse
 
 from pca import tasks
 from pca.models import *
+from options.models import *
+
+TEST_SEMESTER = '2019A'
 
 
 def contains_all(l1, l2):
@@ -13,7 +19,7 @@ def contains_all(l1, l2):
 @patch('pca.models.Email.send_alert')
 class SendAlertTestCase(TestCase):
     def setUp(self):
-        course, section = get_course_and_section('CIS-160-001', '2019A')
+        course, section = get_course_and_section('CIS-160-001', TEST_SEMESTER)
         self.r = Registration(email='yo@example.com',
                               phone='+15555555555',
                               section=section)
@@ -22,10 +28,11 @@ class SendAlertTestCase(TestCase):
 
     def test_send_alert(self, mock_email, mock_text):
         self.assertFalse(Registration.objects.get(id=self.r.id).notification_sent)
-        tasks.send_alert(self.r.id)
+        tasks.send_alert(self.r.id, sent_by='ADM')
         self.assertTrue(mock_email.called)
         self.assertTrue(mock_text.called)
         self.assertTrue(Registration.objects.get(id=self.r.id).notification_sent)
+        self.assertEqual('ADM', Registration.objects.get(id=self.r.id).notification_sent_by)
 
     def test_dont_resend_alert(self, mock_email, mock_text):
         self.r.notification_sent = True
@@ -45,7 +52,7 @@ class SendAlertTestCase(TestCase):
 @patch('pca.tasks.api.get_course')
 class SendAlertsForSectionTestCase(TestCase):
     def setUp(self):
-        self.course, self.section = get_course_and_section('CIS-160-001', '2019A')
+        self.course, self.section = get_course_and_section('CIS-160-001', TEST_SEMESTER)
         with open('pca/mock_registrar_response.json', 'r') as f:
             self.response = json.load(f)
 
@@ -77,19 +84,19 @@ class SendAlertsForSectionTestCase(TestCase):
 class CollectRegistrationTestCase(TestCase):
     def setUp(self):
         self.sections = []
-        self.sections.append(get_course_and_section('CIS-160-001', '2019A')[1])
-        self.sections.append(get_course_and_section('CIS-160-002', '2019A')[1])
+        self.sections.append(get_course_and_section('CIS-160-001', TEST_SEMESTER)[1])
+        self.sections.append(get_course_and_section('CIS-160-002', TEST_SEMESTER)[1])
         self.sections.append(get_course_and_section('CIS-160-001', '2018A')[1])
-        self.sections.append(get_course_and_section('CIS-120-001', '2019A')[1])
+        self.sections.append(get_course_and_section('CIS-120-001', TEST_SEMESTER)[1])
 
     def test_no_registrations(self):
-        result = tasks.collect_registrations('2019A')
+        result = tasks.collect_registrations(TEST_SEMESTER)
         self.assertEqual(0, len(result))
 
     def test_one_registration(self):
         r = Registration(email='e@example.com', section=self.sections[0])
         r.save()
-        result = tasks.collect_registrations('2019A')
+        result = tasks.collect_registrations(TEST_SEMESTER)
         self.assertEqual(1, len(result))
         self.assertTrue(contains_all(result[self.sections[0].normalized], [r.id]))
 
@@ -98,7 +105,7 @@ class CollectRegistrationTestCase(TestCase):
         r2 = Registration(email='e@example.com', section=self.sections[3])
         r1.save()
         r2.save()
-        result = tasks.collect_registrations('2019A')
+        result = tasks.collect_registrations(TEST_SEMESTER)
         self.assertDictEqual(result, {
             self.sections[0].normalized: [r1.id],
             self.sections[3].normalized: [r2.id]
@@ -109,7 +116,7 @@ class CollectRegistrationTestCase(TestCase):
         r2 = Registration(email='e@example.com', section=self.sections[2])
         r1.save()
         r2.save()
-        result = tasks.collect_registrations('2019A')
+        result = tasks.collect_registrations(TEST_SEMESTER)
         self.assertDictEqual(result, {
             self.sections[0].normalized: [r1.id]
         })
@@ -119,7 +126,7 @@ class CollectRegistrationTestCase(TestCase):
         r2 = Registration(email='e@example.com', section=self.sections[1])
         r1.save()
         r2.save()
-        result = tasks.collect_registrations('2019A')
+        result = tasks.collect_registrations(TEST_SEMESTER)
         self.assertDictEqual(result, {
             self.sections[0].normalized: [r1.id],
             self.sections[1].normalized: [r2.id]
@@ -130,7 +137,7 @@ class CollectRegistrationTestCase(TestCase):
         r2 = Registration(email='v@example.com', section=self.sections[0])
         r1.save()
         r2.save()
-        result = tasks.collect_registrations('2019A')
+        result = tasks.collect_registrations(TEST_SEMESTER)
         self.assertEqual(1, len(result))
         self.assertTrue(contains_all([r1.id, r2.id], result[self.sections[0].normalized]))
 
@@ -139,7 +146,7 @@ class CollectRegistrationTestCase(TestCase):
         r2 = Registration(email='v@example.com', section=self.sections[0], notification_sent=True)
         r1.save()
         r2.save()
-        result = tasks.collect_registrations('2019A')
+        result = tasks.collect_registrations(TEST_SEMESTER)
         self.assertEqual(1, len(result))
         self.assertTrue(contains_all([r1.id], result[self.sections[0].normalized]))
 
@@ -147,9 +154,9 @@ class CollectRegistrationTestCase(TestCase):
 class RegisterTestCase(TestCase):
     def setUp(self):
         self.sections = []
-        self.sections.append(get_course_and_section('CIS-160-001', '2019A')[1])
-        self.sections.append(get_course_and_section('CIS-160-002', '2019A')[1])
-        self.sections.append(get_course_and_section('CIS-120-001', '2019A')[1])
+        self.sections.append(get_course_and_section('CIS-160-001', TEST_SEMESTER)[1])
+        self.sections.append(get_course_and_section('CIS-160-002', TEST_SEMESTER)[1])
+        self.sections.append(get_course_and_section('CIS-120-001', TEST_SEMESTER)[1])
 
     def test_successful_registration(self):
         res = register_for_course(self.sections[0].normalized, 'e@example.com', '+15555555555')
@@ -207,7 +214,7 @@ class RegisterTestCase(TestCase):
 
 class ResubscribeTestCase(TestCase):
     def setUp(self):
-        _, self.section = get_course_and_section('CIS-160-001', '2019A')
+        _, self.section = get_course_and_section('CIS-160-001', TEST_SEMESTER)
         self.base_reg = Registration(email='e@example.com', phone='+15555555555', section=self.section)
         self.base_reg.save()
 
@@ -272,3 +279,134 @@ class ResubscribeTestCase(TestCase):
         self.assertEqual(result, reg3)
 
 
+class WebhookTriggeredAlertTestCase(TestCase):
+    def setUp(self):
+        _, self.section = get_course_and_section('CIS-160-001', TEST_SEMESTER)
+        self.r1 = Registration(email='e@example.com', phone='+15555555555', section=self.section)
+        self.r2 = Registration(email='f@example.com', phone='+15555555556', section=self.section)
+        self.r3 = Registration(email='g@example.com', phone='+15555555557', section=self.section)
+        self.r1.save()
+        self.r2.save()
+        self.r3.save()
+
+    def test_collect_all(self):
+        result = tasks.get_active_registrations(self.section.normalized, TEST_SEMESTER)
+        expected_ids = [r.id for r in [self.r1, self.r2, self.r3]]
+        result_ids = [r.id for r in result]
+        for id_ in expected_ids:
+            self.assertTrue(id_ in result_ids)
+
+        for id_ in result_ids:
+            self.assertTrue(id_ in expected_ids)
+
+    def test_collect_none(self):
+        get_course_and_section('CIS-121-001', TEST_SEMESTER)
+        result = tasks.get_active_registrations('CIS-121-001', TEST_SEMESTER)
+        self.assertTrue(len(result) == 0)
+
+    def test_collect_one(self):
+        self.r2.notification_sent = True
+        self.r3.notification_sent = True
+        self.r2.save()
+        self.r3.save()
+        result_ids = [r.id for r in tasks.get_active_registrations(self.section.normalized, TEST_SEMESTER)]
+        expected_ids = [self.r1.id]
+        for id_ in expected_ids:
+            self.assertTrue(id_ in result_ids)
+        for id_ in result_ids:
+            self.assertTrue(id_ in expected_ids)
+
+    def test_collect_some(self):
+        self.r2.notification_sent = True
+        self.r2.save()
+        result_ids = [r.id for r in tasks.get_active_registrations(self.section.normalized, TEST_SEMESTER)]
+        expected_ids = [self.r1.id, self.r3.id]
+        for id_ in expected_ids:
+            self.assertTrue(id_ in result_ids)
+        for id_ in result_ids:
+            self.assertTrue(id_ in expected_ids)
+
+
+@patch('pca.views.alert_for_course')
+class WebhookViewTestCase(TestCase):
+
+    def setUp(self):
+        self.client = Client()
+        self.headers = {
+            'Authorization-Bearer': 'webhook',
+            'Authorization-Token': 'password',
+        }
+        self.body = {
+            "result_data": [{
+                "course_section": "ANTH361401",
+                "previous_status": "C",
+                "section_id_normalized": "ANTH-361-401",
+                "status": "O",
+                "status_code_normalized": "Open",
+                "term": "2019A"
+            }],
+            "service_meta": {
+                "current_page_number": 1,
+                "error_text": "",
+                "next_page_number": 0,
+                "number_of_pages": 1,
+                "previous_page_number": 0,
+                "results_per_page": 0
+
+            }
+        }
+        Option.objects.update_or_create(key='SEND_FROM_WEBHOOK', value_type='BOOL', defaults={'value': 'TRUE'})
+
+    def test_alert_called_and_sent(self, mock_alert):
+        res = self.client.post(
+            reverse('webhook'),
+            data=json.dumps(self.body),
+            content_type='application/json',
+            **self.headers)
+
+        self.assertEqual(200, res.status_code)
+        self.assertTrue(mock_alert.called)
+        self.assertTrue('sent' in json.loads(res.content)['message'])
+
+    def test_alert_called_not_sent(self, mock_alert):
+        Option.objects.update_or_create(key='SEND_FROM_WEBHOOK', value_type='BOOL', defaults={'value': 'FALSE'})
+        res = self.client.post(
+            reverse('webhook'),
+            data=json.dumps(self.body),
+            content_type='application/json',
+            **self.headers)
+
+        self.assertEqual(200, res.status_code)
+        self.assertFalse('sent' in json.loads(res.content)['message'])
+        self.assertFalse(mock_alert.called)
+
+    def test_wrong_method(self, mock_alert):
+        res = self.client.get(reverse('webhook'), **self.headers)
+        self.assertEqual(405, res.status_code)
+        self.assertFalse(mock_alert.called)
+
+    def test_wrong_content(self, mock_alert):
+        res = self.client.post(reverse('webhook'),
+                               **self.headers)
+        self.assertEqual(415, res.status_code)
+        self.assertFalse(mock_alert.called)
+
+    def test_wrong_password(self, mock_alert):
+        self.headers['Authorization-Token'] = 'abc123'
+        res = self.client.post(
+            reverse('webhook'),
+            data=json.dumps(self.body),
+            content_type='application/json',
+            **self.headers)
+        self.assertEqual(401, res.status_code)
+        self.assertFalse(mock_alert.called)
+
+    def test_wrong_user(self, mock_alert):
+        self.headers['Authorization-Bearer'] = 'baduser'
+        res = self.client.post(
+            reverse('webhook'),
+            data=json.dumps(self.body),
+            content_type='application/json',
+            **self.headers)
+        self.assertEqual(401, res.status_code)
+        self.assertFalse(mock_alert.called)

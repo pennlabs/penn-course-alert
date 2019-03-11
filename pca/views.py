@@ -1,11 +1,11 @@
-import redis
+import re
 
 from django.shortcuts import render
-from django.http import HttpResponseRedirect, JsonResponse, Http404
+from django.http import HttpResponseRedirect, JsonResponse, Http404, HttpResponse
 from django.urls import reverse
-from django.template import loader
+
 from .models import *
-from .tasks import generate_course_json
+from .tasks import generate_course_json, send_course_alerts
 from options.models import get_bool
 
 
@@ -77,3 +77,44 @@ def resubscribe(request, id_):
 def get_sections(request):
     sections = generate_course_json()
     return JsonResponse(sections, safe=False)
+
+
+course_id_re = re.compile(r'([A-Z]{3,4})(\d{3})(\d{3})')
+
+
+def normalize_course_id(c):
+    m = course_id_re.match(c)
+    if m:
+        return f'{m.group(1)}-{m.group(2)}-{m.group(3)}'
+    else:
+        return None
+
+
+def alert_for_course(c_id, sent_by):
+    send_course_alerts.delay(c_id, sent_by=sent_by)
+
+
+def accept_webhook(request):
+    app_id = request.META.get('Authorization-Bearer', request.META.get('HTTP_AUTHORIZATION_BEARER'))
+    app_secret = request.META.get('Authorization-Token', request.META.get('HTTP_AUTHORIZATION_TOKEN'))
+
+    if app_id != settings.WEBHOOK_USERNAME or \
+            app_secret != settings.WEBHOOK_PASSWORD:
+        return HttpResponse('''Your credentials cannot be verified. 
+        They should be placed in the header as &quot;Authorization-Bearer&quot;,  
+        YOUR_APP_ID and &quot;Authorization-Token&quot; , YOUR_TOKEN"''', status=401)
+
+    if request.method != 'POST':
+        return HttpResponse('Methods other than POST are not allowed', status=405)
+
+    if 'json' not in request.content_type.lower():
+        return HttpResponse('Request expected in JSON', status=415)
+
+    data = json.loads(request.body)
+    course_id_normalized = normalize_course_id(data['result_data'][0]['course_section'])
+
+    if get_bool('SEND_FROM_WEBHOOK', False):
+        alert_for_course(course_id_normalized, sent_by='WEB')
+        return JsonResponse({'message': 'webhook recieved, alerts sent'})
+    else:
+        return JsonResponse({'message': 'webhook recieved'})

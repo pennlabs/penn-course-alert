@@ -141,6 +141,13 @@ class Registration(models.Model):
     # change to True once notification email has been sent out
     notification_sent = models.BooleanField(default=False)
     notification_sent_at = models.DateTimeField(blank=True, null=True)
+    METHOD_CHOICES = (
+        ('LEG', '[Legacy] Sequence of course API requests'),
+        ('WEB', 'Webhook'),
+        ('SVC', 'Course Status Service'),
+        ('ADM', 'Admin Interface'),
+    )
+    notification_sent_by = models.CharField(max_length=16, choices=METHOD_CHOICES, default='LEG')
 
     # track resubscriptions
     resubscribed_from = models.OneToOneField('Registration',
@@ -171,13 +178,14 @@ class Registration(models.Model):
         full_url = '%s%s' % (settings.BASE_URL, urls.reverse('resubscribe', kwargs={'id_': self.id}))
         return shorten(full_url).shortened
 
-    def alert(self, forced=False):
+    def alert(self, forced=False, sent_by=''):
         if forced or not self.notification_sent:
             text_result = Text(self).send_alert()
             email_result = Email(self).send_alert()
             logging.debug('NOTIFICATION SENT FOR ' + self.__str__())
             self.notification_sent = True
             self.notification_sent_at = timezone.now()
+            self.notification_sent_by = sent_by
             self.save()
             return email_result is not None and text_result is not None  # True if no error in email/text.
         else:
