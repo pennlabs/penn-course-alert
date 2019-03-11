@@ -68,7 +68,7 @@ def load_courses(query='', semester=None):
 
 
 @shared_task(name='pca.tasks.send_alert')
-def send_alert(reg_id, sent_by='LEG'):
+def send_alert(reg_id, sent_by=''):
     result = Registration.objects.get(id=reg_id).alert(sent_by=sent_by)
     return {
         'result': result,
