@@ -149,6 +149,10 @@ REDIS_URL = os.environ.get('REDIS_URL', 'redis://localhost')
 
 MESSAGE_BROKER_URL = os.environ.get('REDIS_URL', 'redis://localhost')
 CELERY_RESULT_BACKEND = 'django-db'
+
+WEBHOOK_USERNAME = os.environ.get('WEBHOOK_USERNAME', 'webhook')
+WEBHOOK_PASSWORD = os.environ.get('WEBHOOK_PASSWORD', 'password')
+
 task_routes = {
     'pca.tasks.load_courses': 'default',
     'pca.tasks.prepare_alerts': 'default',

@@ -106,6 +106,20 @@ def send_alerts_for(section_code, registrations, semester):
             send_alert.delay(reg_id)
 
 
+def get_active_registrations(course_code, semester):
+    _, section = get_course_and_section(course_code, semester)
+    return list(section.registration_set.filter(notification_sent=False))
+
+
+@shared_task(name='pca.tasks.send_course_alerts')
+def send_course_alerts(course_code, semester=None):
+    if semester is None:
+        semester = get_value('SEMESTER')
+
+    for reg in get_active_registrations(course_code, semester):
+        send_alert.delay(reg.id)
+
+
 def collect_registrations(semester):
     alerts = {}
     for reg in Registration.objects.filter(section__course__semester=semester, notification_sent=False):
