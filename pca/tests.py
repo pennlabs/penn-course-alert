@@ -28,10 +28,11 @@ class SendAlertTestCase(TestCase):
 
     def test_send_alert(self, mock_email, mock_text):
         self.assertFalse(Registration.objects.get(id=self.r.id).notification_sent)
-        tasks.send_alert(self.r.id)
+        tasks.send_alert(self.r.id, sent_by='ADM')
         self.assertTrue(mock_email.called)
         self.assertTrue(mock_text.called)
         self.assertTrue(Registration.objects.get(id=self.r.id).notification_sent)
+        self.assertEqual('ADM', Registration.objects.get(id=self.r.id).notification_sent_by)
 
     def test_dont_resend_alert(self, mock_email, mock_text):
         self.r.notification_sent = True

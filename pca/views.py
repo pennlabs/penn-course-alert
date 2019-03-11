@@ -90,8 +90,8 @@ def normalize_course_id(c):
         return None
 
 
-def alert_for_course(c_id):
-    send_course_alerts.delay(c_id)
+def alert_for_course(c_id, sent_by):
+    send_course_alerts.delay(c_id, sent_by=sent_by)
 
 
 def accept_webhook(request):
@@ -114,7 +114,7 @@ def accept_webhook(request):
     course_id_normalized = normalize_course_id(data['result_data'][0]['course_section'])
 
     if get_bool('SEND_FROM_WEBHOOK', False):
-        alert_for_course(course_id_normalized)
+        alert_for_course(course_id_normalized, sent_by='WEB')
         return JsonResponse({'message': 'webhook recieved, alerts sent'})
     else:
         return JsonResponse({'message': 'webhook recieved'})
