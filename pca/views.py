@@ -1,4 +1,5 @@
 import re
+import base64
 
 from django.shortcuts import render
 from django.http import HttpResponseRedirect, JsonResponse, Http404, HttpResponse
@@ -90,16 +91,33 @@ def normalize_course_id(c):
         return None
 
 
-def alert_for_course(c_id, sent_by):
-    send_course_alerts.delay(c_id, sent_by=sent_by)
+def alert_for_course(c_id, semester, sent_by):
+    send_course_alerts.delay(c_id, semester=semester, sent_by=sent_by)
+
+
+def extract_basic_auth(auth_header):
+    """
+    extract username and password from a basic auth header
+    :param auth_header: content of the Authorization HTTP header
+    :return: username and password extracted from the header
+    """
+    parts = auth_header.split(' ')
+    if parts[0] != 'Basic' or len(parts) < 2:
+        return None, None
+
+    auth_parts = base64.b64decode(parts[1]).split(b':')
+    if len(auth_parts) < 2:
+        return None, None
+    return auth_parts[0].decode(), auth_parts[1].decode()
 
 
 def accept_webhook(request):
-    app_id = request.META.get('Authorization-Bearer', request.META.get('HTTP_AUTHORIZATION_BEARER'))
-    app_secret = request.META.get('Authorization-Token', request.META.get('HTTP_AUTHORIZATION_TOKEN'))
+    auth_header = request.META.get('Authorization', request.META.get('HTTP_AUTHORIZATION', ''))
 
-    if app_id != settings.WEBHOOK_USERNAME or \
-            app_secret != settings.WEBHOOK_PASSWORD:
+    username, password = extract_basic_auth(auth_header)
+
+    if username != settings.WEBHOOK_USERNAME or \
+            password != settings.WEBHOOK_PASSWORD:
         return HttpResponse('''Your credentials cannot be verified. 
         They should be placed in the header as &quot;Authorization-Bearer&quot;,  
         YOUR_APP_ID and &quot;Authorization-Token&quot; , YOUR_TOKEN"''', status=401)
@@ -111,10 +129,24 @@ def accept_webhook(request):
         return HttpResponse('Request expected in JSON', status=415)
 
     data = json.loads(request.body)
+
+    course_id = data.get('result_data', [{}])[0].get('course_section', None)
+    if course_id is None:
+        return HttpResponse('Course ID could not be extracted', 400)
+
+    course_status = data.get('result_data', [{}])[0].get('status', None)
+    if course_status is None:
+        return HttpResponse('Course Status could not be extracted from response', 400)
+
+    course_term = data.get('result_data', [{}])[0].get('term', None)
+    if course_term is None:
+        return HttpResponse('Course Term could not be extracted from response', 400)
+
     course_id_normalized = normalize_course_id(data['result_data'][0]['course_section'])
 
-    if get_bool('SEND_FROM_WEBHOOK', False):
-        alert_for_course(course_id_normalized, sent_by='WEB')
+    if get_bool('SEND_FROM_WEBHOOK', False) and course_status == 'O':
+        alert_for_course(course_id_normalized, semester=course_term, sent_by='WEB')
         return JsonResponse({'message': 'webhook recieved, alerts sent'})
+
     else:
         return JsonResponse({'message': 'webhook recieved'})

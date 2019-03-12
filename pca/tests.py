@@ -1,4 +1,5 @@
 import json
+import base64
 from unittest.mock import Mock, patch
 
 from django.test import TestCase, Client
@@ -329,12 +330,11 @@ class WebhookTriggeredAlertTestCase(TestCase):
 
 @patch('pca.views.alert_for_course')
 class WebhookViewTestCase(TestCase):
-
     def setUp(self):
         self.client = Client()
+        auth = base64.standard_b64encode('webhook:password'.encode('ascii'))
         self.headers = {
-            'Authorization-Bearer': 'webhook',
-            'Authorization-Token': 'password',
+            'Authorization': f'Basic {auth.decode()}',
         }
         self.body = {
             "result_data": [{
@@ -366,9 +366,24 @@ class WebhookViewTestCase(TestCase):
 
         self.assertEqual(200, res.status_code)
         self.assertTrue(mock_alert.called)
+        self.assertEqual('ANTH-361-401', mock_alert.call_args[0][0])
+        self.assertEqual('2019A', mock_alert.call_args[1]['semester'])
         self.assertTrue('sent' in json.loads(res.content)['message'])
 
-    def test_alert_called_not_sent(self, mock_alert):
+    def test_alert_called_closed_course(self, mock_alert):
+        self.body['result_data'][0]['status'] = 'C'
+        self.body['result_data'][0]['status_code_normalized'] = 'Closed'
+        res = self.client.post(
+            reverse('webhook'),
+            data=json.dumps(self.body),
+            content_type='application/json',
+            **self.headers)
+
+        self.assertEqual(200, res.status_code)
+        self.assertFalse('sent' in json.loads(res.content)['message'])
+        self.assertFalse(mock_alert.called)
+
+    def test_alert_called_alerts_off(self, mock_alert):
         Option.objects.update_or_create(key='SEND_FROM_WEBHOOK', value_type='BOOL', defaults={'value': 'FALSE'})
         res = self.client.post(
             reverse('webhook'),
@@ -392,7 +407,7 @@ class WebhookViewTestCase(TestCase):
         self.assertFalse(mock_alert.called)
 
     def test_wrong_password(self, mock_alert):
-        self.headers['Authorization-Token'] = 'abc123'
+        self.headers['Authorization'] = 'Basic ' + base64.standard_b64encode('webhook:abc123'.encode('ascii')).decode()
         res = self.client.post(
             reverse('webhook'),
             data=json.dumps(self.body),
@@ -402,7 +417,7 @@ class WebhookViewTestCase(TestCase):
         self.assertFalse(mock_alert.called)
 
     def test_wrong_user(self, mock_alert):
-        self.headers['Authorization-Bearer'] = 'baduser'
+        self.headers['Authorization'] = 'Basic ' + base64.standard_b64encode('baduser:password'.encode('ascii')).decode()
         res = self.client.post(
             reverse('webhook'),
             data=json.dumps(self.body),
