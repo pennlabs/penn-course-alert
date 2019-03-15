@@ -4,6 +4,7 @@ import base64
 from django.shortcuts import render
 from django.http import HttpResponseRedirect, JsonResponse, Http404, HttpResponse
 from django.urls import reverse
+from django.views.decorators.csrf import csrf_exempt
 
 from .models import *
 from .tasks import generate_course_json, send_course_alerts
@@ -111,6 +112,7 @@ def extract_basic_auth(auth_header):
     return auth_parts[0].decode(), auth_parts[1].decode()
 
 
+@csrf_exempt
 def accept_webhook(request):
     auth_header = request.META.get('Authorization', request.META.get('HTTP_AUTHORIZATION', ''))
 
