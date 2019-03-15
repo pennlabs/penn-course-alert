@@ -135,21 +135,21 @@ def accept_webhook(request):
     except json.JSONDecodeError:
         return HttpResponse('Error decoding JSON body', status=400)
 
-    course_id = data.get('result_data', [{}])[0].get('course_section', None)
+    course_id = data.get('course_section', None)
     if course_id is None:
-        return HttpResponse('Course ID could not be extracted', 400)
+        return HttpResponse('Course ID could not be extracted from response', status=400)
 
-    course_status = data.get('result_data', [{}])[0].get('status', None)
+    course_status = data.get('status', None)
     if course_status is None:
-        return HttpResponse('Course Status could not be extracted from response', 400)
+        return HttpResponse('Course Status could not be extracted from response', status=400)
 
-    course_term = data.get('result_data', [{}])[0].get('term', None)
+    course_term = data.get('term', None)
     if course_term is None:
-        return HttpResponse('Course Term could not be extracted from response', 400)
+        return HttpResponse('Course Term could not be extracted from response', status=400)
 
-    prev_status = data.get('result_data', [{}])[0].get('previous_status', None)
+    prev_status = data.get('previous_status', None)
     if prev_status is None:
-        return HttpResponse('Previous Status could not be extracted from response', 400)
+        return HttpResponse('Previous Status could not be extracted from response', status=400)
 
     course_id_normalized = normalize_course_id(course_id)
 

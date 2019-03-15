@@ -337,23 +337,11 @@ class WebhookViewTestCase(TestCase):
             'Authorization': f'Basic {auth.decode()}',
         }
         self.body = {
-            "result_data": [{
-                "course_section": "ANTH361401",
-                "previous_status": "C",
-                "section_id_normalized": "ANTH-361-401",
-                "status": "O",
-                "status_code_normalized": "Open",
-                "term": "2019A"
-            }],
-            "service_meta": {
-                "current_page_number": 1,
-                "error_text": "",
-                "next_page_number": 0,
-                "number_of_pages": 1,
-                "previous_page_number": 0,
-                "results_per_page": 0
-
-            }
+            "course_section": "ANTH361401",
+            "previous_status": "X",
+            "status": "O",
+            "status_code_normalized": "Open",
+            "term": "2019A"
         }
         Option.objects.update_or_create(key='SEND_FROM_WEBHOOK', value_type='BOOL', defaults={'value': 'TRUE'})
 
@@ -385,8 +373,8 @@ class WebhookViewTestCase(TestCase):
         self.assertEqual(0, CourseUpdate.objects.count())
 
     def test_alert_called_closed_course(self, mock_alert):
-        self.body['result_data'][0]['status'] = 'C'
-        self.body['result_data'][0]['status_code_normalized'] = 'Closed'
+        self.body['status'] = 'C'
+        self.body['status_code_normalized'] = 'Closed'
         res = self.client.post(
             reverse('webhook'),
             data=json.dumps(self.body),
@@ -414,6 +402,34 @@ class WebhookViewTestCase(TestCase):
         self.assertEqual(1, CourseUpdate.objects.count())
         u = CourseUpdate.objects.get()
         self.assertFalse(u.alert_sent)
+
+    def test_bad_format(self, mock_alert):
+        self.body = {'hello': 'world'}
+        res = self.client.post(
+            reverse('webhook'),
+            data=json.dumps({
+                "hello": "world"
+            }),
+            content_type='application/json',
+            **self.headers)
+        self.assertEqual(400, res.status_code)
+        self.assertFalse(mock_alert.called)
+        self.assertEqual(0, CourseUpdate.objects.count())
+
+    def test_no_status(self, mock_alert):
+        res = self.client.post(
+            reverse('webhook'),
+            data=json.dumps({
+                "course_section": "ANTH361401",
+                "previous_status": "X",
+                "status_code_normalized": "Open",
+                "term": "2019A"
+            }),
+            content_type='application/json',
+            **self.headers)
+        self.assertEqual(400, res.status_code)
+        self.assertFalse(mock_alert.called)
+        self.assertEqual(0, CourseUpdate.objects.count())
 
     def test_wrong_method(self, mock_alert):
         res = self.client.get(reverse('webhook'), **self.headers)
