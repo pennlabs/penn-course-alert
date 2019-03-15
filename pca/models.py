@@ -236,9 +236,14 @@ def register_for_course(course_code, email_address, phone):
 
 
 class CourseUpdate(models.Model):
+    STATUS_CHOICES = (
+        ('O', 'Open'),
+        ('C', 'Closed'),
+        ('X', 'Cancelled')
+    )
     section = models.ForeignKey(Section, on_delete=models.CASCADE)
-    old_status = models.CharField(max_length=16, choices=(('Open', 'O'), ('Closed', 'C')))
-    new_status = models.CharField(max_length=16, choices=(('Open', 'O'), ('Closed', 'C')))
+    old_status = models.CharField(max_length=16, choices=STATUS_CHOICES)
+    new_status = models.CharField(max_length=16, choices=STATUS_CHOICES)
     created_at = models.DateTimeField(auto_now_add=True)
     alert_sent = models.BooleanField()
     request_body = models.TextField()

@@ -35,8 +35,12 @@ class InstructorAdmin(admin.ModelAdmin):
     search_fields = ('name', )
 
 
+class CourseUpdateAdmin(admin.ModelAdmin):
+    autocomplete_fields = ('section', )
+
+
 admin.site.register(Instructor, InstructorAdmin)
 admin.site.register(Course, CourseAdmin)
 admin.site.register(Section, SectionAdmin)
 admin.site.register(Registration, RegistrationAdmin)
-admin.site.register(CourseUpdate)
+admin.site.register(CourseUpdate, CourseUpdateAdmin)
