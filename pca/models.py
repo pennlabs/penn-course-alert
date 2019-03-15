@@ -245,7 +245,6 @@ class CourseUpdate(models.Model):
 
 
 def record_update(section_id, semester, old_status, new_status, alerted, req):
-    print(section_id)
     _, section = get_course_and_section(section_id, semester)
     u = CourseUpdate(section=section,
                      old_status=old_status,
