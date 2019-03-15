@@ -8,6 +8,7 @@ from django.urls import reverse
 from pca import tasks
 from pca.models import *
 from options.models import *
+from pca.views import normalize_course_id
 
 TEST_SEMESTER = '2019A'
 
@@ -326,6 +327,14 @@ class WebhookTriggeredAlertTestCase(TestCase):
             self.assertTrue(id_ in result_ids)
         for id_ in result_ids:
             self.assertTrue(id_ in expected_ids)
+
+
+class CourseNormalizeIDTestCase(TestCase):
+    def test_four_letter_dept_code(self):
+        self.assertEqual('ANTH-361-401', normalize_course_id('ANTH361401'))
+
+    def test_three_letter_dept_code(self):
+        self.assertEqual('CIS-120-001', normalize_course_id('CIS120001'))
 
 
 @patch('pca.views.alert_for_course')
