@@ -130,7 +130,10 @@ def accept_webhook(request):
     if 'json' not in request.content_type.lower():
         return HttpResponse('Request expected in JSON', status=415)
 
-    data = json.loads(request.body)
+    try:
+        data = json.loads(request.body)
+    except json.JSONDecodeError:
+        return HttpResponse('Error decoding JSON body', status=400)
 
     course_id = data.get('result_data', [{}])[0].get('course_section', None)
     if course_id is None:

@@ -370,6 +370,16 @@ class WebhookViewTestCase(TestCase):
         self.assertEqual('2019A', mock_alert.call_args[1]['semester'])
         self.assertTrue('sent' in json.loads(res.content)['message'])
 
+    def test_alert_bad_json(self, mock_alert):
+        res = self.client.post(
+            reverse('webhook'),
+            data='blah',
+            content_type='application/json',
+            **self.headers)
+
+        self.assertEqual(400, res.status_code)
+        self.assertFalse(mock_alert.called)
+
     def test_alert_called_closed_course(self, mock_alert):
         self.body['result_data'][0]['status'] = 'C'
         self.body['result_data'][0]['status_code_normalized'] = 'Closed'
