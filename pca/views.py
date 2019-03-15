@@ -147,9 +147,22 @@ def accept_webhook(request):
     if course_term is None:
         return HttpResponse('Course Term could not be extracted from response', 400)
 
-    course_id_normalized = normalize_course_id(data['result_data'][0]['course_section'])
+    prev_status = data.get('result_data', [{}])[0].get('previous_status', None)
+    if prev_status is None:
+        return HttpResponse('Previous Status could not be extracted from response', 400)
 
-    if get_bool('SEND_FROM_WEBHOOK', False) and course_status == 'O':
+    course_id_normalized = normalize_course_id(course_id)
+
+    should_send_alert = get_bool('SEND_FROM_WEBHOOK', False) and course_status == 'O'
+
+    record_update(course_id_normalized,
+                  course_term,
+                  prev_status,
+                  course_status,
+                  should_send_alert,
+                  request.body)
+
+    if should_send_alert:
         alert_for_course(course_id_normalized, semester=course_term, sent_by='WEB')
         return JsonResponse({'message': 'webhook recieved, alerts sent'})
 

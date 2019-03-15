@@ -233,3 +233,24 @@ def register_for_course(course_code, email_address, phone):
 
     registration.save()
     return RegStatus.SUCCESS
+
+
+class CourseUpdate(models.Model):
+    section = models.ForeignKey(Section, on_delete=models.CASCADE)
+    old_status = models.CharField(max_length=16, choices=(('Open', 'O'), ('Closed', 'C')))
+    new_status = models.CharField(max_length=16, choices=(('Open', 'O'), ('Closed', 'C')))
+    created_at = models.DateTimeField(auto_now_add=True)
+    alert_sent = models.BooleanField()
+    request_body = models.TextField()
+
+
+def record_update(section_id, semester, old_status, new_status, alerted, req):
+    print(section_id)
+    _, section = get_course_and_section(section_id, semester)
+    u = CourseUpdate(section=section,
+                     old_status=old_status,
+                     new_status=new_status,
+                     alert_sent=alerted,
+                     request_body=req)
+    u.save()
+

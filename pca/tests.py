@@ -369,6 +369,9 @@ class WebhookViewTestCase(TestCase):
         self.assertEqual('ANTH-361-401', mock_alert.call_args[0][0])
         self.assertEqual('2019A', mock_alert.call_args[1]['semester'])
         self.assertTrue('sent' in json.loads(res.content)['message'])
+        self.assertEqual(1, CourseUpdate.objects.count())
+        u = CourseUpdate.objects.get()
+        self.assertTrue(u.alert_sent)
 
     def test_alert_bad_json(self, mock_alert):
         res = self.client.post(
@@ -379,6 +382,7 @@ class WebhookViewTestCase(TestCase):
 
         self.assertEqual(400, res.status_code)
         self.assertFalse(mock_alert.called)
+        self.assertEqual(0, CourseUpdate.objects.count())
 
     def test_alert_called_closed_course(self, mock_alert):
         self.body['result_data'][0]['status'] = 'C'
@@ -392,6 +396,9 @@ class WebhookViewTestCase(TestCase):
         self.assertEqual(200, res.status_code)
         self.assertFalse('sent' in json.loads(res.content)['message'])
         self.assertFalse(mock_alert.called)
+        self.assertEqual(1, CourseUpdate.objects.count())
+        u = CourseUpdate.objects.get()
+        self.assertFalse(u.alert_sent)
 
     def test_alert_called_alerts_off(self, mock_alert):
         Option.objects.update_or_create(key='SEND_FROM_WEBHOOK', value_type='BOOL', defaults={'value': 'FALSE'})
@@ -404,17 +411,22 @@ class WebhookViewTestCase(TestCase):
         self.assertEqual(200, res.status_code)
         self.assertFalse('sent' in json.loads(res.content)['message'])
         self.assertFalse(mock_alert.called)
+        self.assertEqual(1, CourseUpdate.objects.count())
+        u = CourseUpdate.objects.get()
+        self.assertFalse(u.alert_sent)
 
     def test_wrong_method(self, mock_alert):
         res = self.client.get(reverse('webhook'), **self.headers)
         self.assertEqual(405, res.status_code)
         self.assertFalse(mock_alert.called)
+        self.assertEqual(0, CourseUpdate.objects.count())
 
     def test_wrong_content(self, mock_alert):
         res = self.client.post(reverse('webhook'),
                                **self.headers)
         self.assertEqual(415, res.status_code)
         self.assertFalse(mock_alert.called)
+        self.assertEqual(0, CourseUpdate.objects.count())
 
     def test_wrong_password(self, mock_alert):
         self.headers['Authorization'] = 'Basic ' + base64.standard_b64encode('webhook:abc123'.encode('ascii')).decode()
@@ -425,6 +437,7 @@ class WebhookViewTestCase(TestCase):
             **self.headers)
         self.assertEqual(401, res.status_code)
         self.assertFalse(mock_alert.called)
+        self.assertEqual(0, CourseUpdate.objects.count())
 
     def test_wrong_user(self, mock_alert):
         self.headers['Authorization'] = 'Basic ' + base64.standard_b64encode('baduser:password'.encode('ascii')).decode()
@@ -435,3 +448,4 @@ class WebhookViewTestCase(TestCase):
             **self.headers)
         self.assertEqual(401, res.status_code)
         self.assertFalse(mock_alert.called)
+        self.assertEqual(0, CourseUpdate.objects.count())
