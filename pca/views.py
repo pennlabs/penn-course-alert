@@ -81,7 +81,7 @@ def get_sections(request):
     return JsonResponse(sections, safe=False)
 
 
-course_id_re = re.compile(r'([A-Z]{4}|[A-Z]{3} )(\d{3})(\d{3})')
+course_id_re = re.compile(r'([A-Z]{4}|[A-Z]{3} |[A-Z]{2}  )(\d{3})(\d{3})')
 
 
 def normalize_course_id(c):

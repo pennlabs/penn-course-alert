@@ -336,6 +336,9 @@ class CourseNormalizeIDTestCase(TestCase):
     def test_three_letter_dept_code(self):
         self.assertEqual('CIS-120-001', normalize_course_id('CIS 120001'))
 
+    def test_two_letter_dept_code(self):
+        self.assertEqual('WH-110-001', normalize_course_id('WH  110001'))
+
 
 @patch('pca.views.alert_for_course')
 class WebhookViewTestCase(TestCase):
