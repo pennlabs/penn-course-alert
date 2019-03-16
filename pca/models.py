@@ -239,7 +239,8 @@ class CourseUpdate(models.Model):
     STATUS_CHOICES = (
         ('O', 'Open'),
         ('C', 'Closed'),
-        ('X', 'Cancelled')
+        ('X', 'Cancelled'),
+        ('', 'Unlisted')
     )
     section = models.ForeignKey(Section, on_delete=models.CASCADE)
     old_status = models.CharField(max_length=16, choices=STATUS_CHOICES)
