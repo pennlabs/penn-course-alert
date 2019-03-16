@@ -248,6 +248,10 @@ class CourseUpdate(models.Model):
     alert_sent = models.BooleanField()
     request_body = models.TextField()
 
+    def __str__(self):
+        d = dict(self.STATUS_CHOICES)
+        return f'{self.section.__str__()} - {d[self.old_status]} to {d[self.new_status]}'
+
 
 def record_update(section_id, semester, old_status, new_status, alerted, req):
     _, section = get_course_and_section(section_id, semester)
