@@ -1,5 +1,6 @@
 import re
 import base64
+import logging
 
 from django.shortcuts import render
 from django.http import HttpResponseRedirect, JsonResponse, Http404, HttpResponse
@@ -9,6 +10,9 @@ from django.views.decorators.csrf import csrf_exempt
 from .models import *
 from .tasks import generate_course_json, send_course_alerts
 from options.models import get_bool
+
+
+logger = logging.getLogger(__name__)
 
 
 # Helper function to return the homepage with a banner message.
@@ -81,10 +85,11 @@ def get_sections(request):
     return JsonResponse(sections, safe=False)
 
 
-course_id_re = re.compile(r'([A-Z]{4}|[A-Z]{3} |[A-Z]{2}  )(\d{3})(\d{3})')
+course_id_re = re.compile(r'([A-Z]+)(\d{3})(\d{3})')
 
 
 def normalize_course_id(c):
+    c = c.replace(' ', '')
     m = course_id_re.match(c)
     if m:
         return f'{m.group(1).strip()}-{m.group(2).strip()}-{m.group(3).strip()}'
@@ -152,6 +157,9 @@ def accept_webhook(request):
         return HttpResponse('Previous Status could not be extracted from response', status=400)
 
     course_id_normalized = normalize_course_id(course_id)
+    if course_id_normalized is None:
+        logger.error('Could not parse course ID in JSON request', exc_info=True, extra={'request': request})
+        return HttpResponse('Could not parse course ID in JSON request', status=500)
 
     should_send_alert = get_bool('SEND_FROM_WEBHOOK', False) and course_status == 'O'
 
