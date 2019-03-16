@@ -112,6 +112,18 @@ def extract_basic_auth(auth_header):
     return auth_parts[0].decode(), auth_parts[1].decode()
 
 
+def extract_update_data(update):
+    return (
+        update.get('course_section', None),
+        update.get('status', None),
+        update.get('term', None),
+        update.get('previous_status', None),
+    )
+
+
+def handle_course_update(update):
+    pass
+
 @csrf_exempt
 def accept_webhook(request):
     auth_header = request.META.get('Authorization', request.META.get('HTTP_AUTHORIZATION', ''))

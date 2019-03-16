@@ -37,6 +37,17 @@ def report_api_error(err):
         logger.error('Penn API error', extra={'error_msg': err})
 
 
+def get_all_course_availability(semester):
+    headers = get_headers()
+    url = f'https://esb.isc-seo.upenn.edu/8091/open_data/course_status/{semester}/all'
+    r = requests.get(url, headers=headers)
+    if r.status_code == requests.codes.ok:
+        return r.json().get('result_data', [])
+    else:
+        report_api_error(r.text)
+        return None
+
+
 def get_courses(query, semester):
     headers = get_headers()
 
