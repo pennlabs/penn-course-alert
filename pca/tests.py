@@ -334,7 +334,7 @@ class CourseNormalizeIDTestCase(TestCase):
         self.assertEqual('ANTH-361-401', normalize_course_id('ANTH361401'))
 
     def test_three_letter_dept_code(self):
-        self.assertEqual('CIS-120-001', normalize_course_id('CIS120001'))
+        self.assertEqual('CIS-120-001', normalize_course_id('CIS 120001'))
 
 
 @patch('pca.views.alert_for_course')
