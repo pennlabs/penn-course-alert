@@ -161,7 +161,8 @@ def accept_webhook(request):
         logger.error('Could not parse course ID in JSON request', exc_info=True, extra={'request': request})
         return HttpResponse('Could not parse course ID in JSON request', status=500)
 
-    should_send_alert = get_bool('SEND_FROM_WEBHOOK', False) and course_status == 'O'
+    should_send_alert = get_bool('SEND_FROM_WEBHOOK', False) and \
+        course_status == 'O' and get_value('SEMESTER') == course_term
 
     record_update(course_id_normalized,
                   course_term,

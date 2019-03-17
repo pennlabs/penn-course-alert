@@ -353,9 +353,10 @@ class WebhookViewTestCase(TestCase):
             "previous_status": "X",
             "status": "O",
             "status_code_normalized": "Open",
-            "term": "2019A"
+            "term": TEST_SEMESTER
         }
         Option.objects.update_or_create(key='SEND_FROM_WEBHOOK', value_type='BOOL', defaults={'value': 'TRUE'})
+        Option.objects.update_or_create(key='SEMESTER', value_type='TXT', defaults={'value': TEST_SEMESTER})
 
     def test_alert_called_and_sent(self, mock_alert):
         res = self.client.post(
