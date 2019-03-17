@@ -353,9 +353,10 @@ class WebhookViewTestCase(TestCase):
             "previous_status": "X",
             "status": "O",
             "status_code_normalized": "Open",
-            "term": "2019A"
+            "term": TEST_SEMESTER
         }
         Option.objects.update_or_create(key='SEND_FROM_WEBHOOK', value_type='BOOL', defaults={'value': 'TRUE'})
+        Option.objects.update_or_create(key='SEMESTER', value_type='TXT', defaults={'value': TEST_SEMESTER})
 
     def test_alert_called_and_sent(self, mock_alert):
         res = self.client.post(
@@ -387,6 +388,21 @@ class WebhookViewTestCase(TestCase):
     def test_alert_called_closed_course(self, mock_alert):
         self.body['status'] = 'C'
         self.body['status_code_normalized'] = 'Closed'
+        res = self.client.post(
+            reverse('webhook'),
+            data=json.dumps(self.body),
+            content_type='application/json',
+            **self.headers)
+
+        self.assertEqual(200, res.status_code)
+        self.assertFalse('sent' in json.loads(res.content)['message'])
+        self.assertFalse(mock_alert.called)
+        self.assertEqual(1, CourseUpdate.objects.count())
+        u = CourseUpdate.objects.get()
+        self.assertFalse(u.alert_sent)
+
+    def test_alert_called_wrong_sem(self, mock_alert):
+        self.body['term'] = 'NOTRM'
         res = self.client.post(
             reverse('webhook'),
             data=json.dumps(self.body),
