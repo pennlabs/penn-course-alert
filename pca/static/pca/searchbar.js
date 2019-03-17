@@ -21,8 +21,17 @@ function getDemandIcon(demand) {
 
 $(document).ready(function(){
   var courses = new Bloodhound({
-    datumTokenizer: Bloodhound.tokenizers.obj.whitespace('section_id'),
-    queryTokenizer: Bloodhound.tokenizers.whitespace,
+    datumTokenizer: Bloodhound.tokenizers.obj.nonword('section_id'),
+    queryTokenizer: function(word) {
+      var r = /([a-zA-Z]+)(\d{3})(\d{3})?/;
+      var e = r.exec(word)
+      if (e) {
+        var r = [e[1], e[2], e[3]]
+        return r
+      } else {
+        return Bloodhound.tokenizers.nonword(word)
+      }
+    },
     prefetch: '/courses'
     // remote: {
     //   url: '/courses?dept=%QUERY',
