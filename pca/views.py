@@ -15,14 +15,16 @@ from options.models import get_bool
 logger = logging.getLogger(__name__)
 
 
+def render_homepage(request, notifications):
+    return render(request, 'index.html', {
+        'notifications': notifications,
+        'recruiting': get_bool('RECRUITING', False)
+    })
+
+
 # Helper function to return the homepage with a banner message.
 def homepage_with_msg(request, type_, msg):
-    return render(request, 'index.html', {
-        'notification': {
-            'type': type_,
-            'text': msg
-        }
-    })
+    return render_homepage(request, [{'type': type_, 'text': msg}])
 
 
 def homepage_closed(request):
@@ -35,7 +37,7 @@ def index(request):
     if not get_bool('REGISTRATION_OPEN', True):
         return homepage_closed(request)
 
-    return render(request, 'index.html')
+    return render(request, 'index.html', {'notifications': []})
 
 
 def register(request):

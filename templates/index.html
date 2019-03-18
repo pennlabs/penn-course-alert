@@ -95,16 +95,23 @@ CJFblaXvAAAAAElFTkSuQmCC"/>
     </style>
   </head>
   <body>
- {% if notification %}
-  <div class="has-text-centered notification {% if notification.type == 'success' %} is-success
-                                             {% elif notification.type == 'danger' %} is-danger
-                                             {% elif notification.type == 'warning' %} is-warning {% else %} is-info {% endif %}"
-       id="notificationBar">
-      <button class="delete" id="dismiss"></button>
-  {{ notification.text }}
-  </div>
+  <div id="main">
+      {% if recruiting %}
+      <div class="has-text-centered notification is-info" style="margin-bottom: 0; border-radius: 0;">
+      Want to be a part of the team that makes Penn Course Alert and other products? Penn Labs is recruiting.
+          <a href="//apply.pennlabs.org">Apply here!</a>
+      </div>
   {% endif %}
-    <section class="section is-block-mobile" id="main">
+  {% for n in  notifications%}
+    <div class="has-text-centered notification {% if n.type == 'success' %} is-success
+                                             {% elif n.type == 'danger' %} is-danger
+                                             {% elif n.type == 'warning' %} is-warning {% else %} is-info {% endif %}"
+       id="notificationBar">
+      <button class="delete dismiss"></button>
+      {{ n.text }}
+    </div>
+  {% endfor %}
+    <section class="section is-block-mobile">
       <div class="container has-text-centered">
         <div class="level" style="margin-bottom:0.5rem">
           <div class="level-item">
@@ -173,6 +180,8 @@ CJFblaXvAAAAAElFTkSuQmCC"/>
                 </script>
             </div>
         </div>
+  </div>
+
     </body>
 
     <div class="footer has-text-centered">
@@ -270,9 +279,9 @@ CJFblaXvAAAAAElFTkSuQmCC"/>
       $('.modal-background').click(() => {
           $('#modal').hide()
       })
-        $('#dismiss').click(() => {
-            $('#notificationBar').slideUp()
-        })
+      $('.dismiss').click((e) => {
+          $(e.target).parent().slideUp()
+      })
     </script>
   </body>
 </html>
