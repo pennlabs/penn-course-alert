@@ -23,14 +23,15 @@ def render_homepage(request, notifications):
 
 
 # Helper function to return the homepage with a banner message.
-def homepage_with_msg(request, type_, msg):
-    return render_homepage(request, [{'type': type_, 'text': msg}])
+def homepage_with_msg(request, type_, msg, closeable=True):
+    return render_homepage(request, [{'type': type_, 'text': msg, 'closeable': closeable}])
 
 
 def homepage_closed(request):
     return homepage_with_msg(request,
                              'danger',
-                             "We're currently closed for signups. Come back after schedules have been released!")
+                             "We're currently closed for signups. Come back after schedules have been released!",
+                             False)
 
 
 def index(request):
