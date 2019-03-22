@@ -8,7 +8,6 @@ from django.urls import reverse
 from pca import tasks
 from pca.models import *
 from options.models import *
-from pca.views import normalize_course_id
 
 TEST_SEMESTER = '2019A'
 
@@ -329,15 +328,64 @@ class WebhookTriggeredAlertTestCase(TestCase):
             self.assertTrue(id_ in expected_ids)
 
 
-class CourseNormalizeIDTestCase(TestCase):
+class SepCourseCodeTest(TestCase):
     def test_four_letter_dept_code(self):
-        self.assertEqual('ANTH-361-401', normalize_course_id('ANTH361401'))
+        self.assertEqual(('ANTH', '361', '401'), separate_course_code('ANTH361401'))
 
     def test_three_letter_dept_code(self):
-        self.assertEqual('CIS-120-001', normalize_course_id('CIS 120001'))
+        self.assertEqual(('CIS', '120', '001'), separate_course_code('CIS 120001'))
 
     def test_two_letter_dept_code(self):
-        self.assertEqual('WH-110-001', normalize_course_id('WH  110001'))
+        self.assertEqual(('WH', '110', '001'), separate_course_code('WH  110001'))
+
+    def test_four_letter_with_dashes(self):
+        self.assertEqual(('PSCI', '110', '001'), separate_course_code('PSCI-110-001'))
+
+    def test_three_letter_with_dashes(self):
+        self.assertEqual(('CIS', '110', '001'), separate_course_code('CIS -110-001'))
+
+    def test_two_letter_with_dashes(self):
+        self.assertEqual(('WH', '110', '001'), separate_course_code('WH  -110-001'))
+
+    def test_invalid_course(self):
+        try:
+            separate_course_code('BLAH BLAH BLAH')
+            self.fail('Should throw exception')
+        except ValueError:
+            pass
+
+
+class GetCourseSectionTest(TestCase):
+    def setUp(self):
+        self.c = Course(department='PSCI',
+                        code='131',
+                        semester=TEST_SEMESTER,
+                        title='American Foreign Policy')
+        self.c.save()
+        self.s = Section(code='001', course=self.c)
+        self.s.save()
+
+    def assertCourseSame(self, s):
+        course, section = get_course_and_section(s, TEST_SEMESTER)
+        self.assertEqual(course, self.c, s)
+        self.assertEqual(section, self.s, s)
+
+    def test_get_course_exists_nodash(self):
+        test_valid = [
+            'PSCI131001',
+            'PSCI 131 001',
+            'PSCI 131001',
+            'PSCI-131-001'
+        ]
+        for test in test_valid:
+            self.assertCourseSame(test)
+
+    def test_create_course(self):
+        course, section = get_course_and_section('CIS 120 001', TEST_SEMESTER)
+        self.assertEqual(Course.objects.count(), 2)
+        self.assertEqual(course.department, 'CIS')
+        self.assertEqual(course.code, '120')
+        self.assertEqual(section.code, '001')
 
 
 @patch('pca.views.alert_for_course')
@@ -367,7 +415,7 @@ class WebhookViewTestCase(TestCase):
 
         self.assertEqual(200, res.status_code)
         self.assertTrue(mock_alert.called)
-        self.assertEqual('ANTH-361-401', mock_alert.call_args[0][0])
+        self.assertEqual('ANTH361401', mock_alert.call_args[0][0])
         self.assertEqual('2019A', mock_alert.call_args[1]['semester'])
         self.assertTrue('sent' in json.loads(res.content)['message'])
         self.assertEqual(1, CourseUpdate.objects.count())

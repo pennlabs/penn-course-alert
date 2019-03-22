@@ -5,3 +5,5 @@
 celerybeat-schedule
 celerybeat.pid
 test-results/
+.coverage
+htmlcov/

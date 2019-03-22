@@ -3,7 +3,7 @@ from enum import Enum, auto
 from urllib.parse import urlencode
 import logging
 from smtplib import SMTPRecipientsRefused
-
+import re
 
 from django.db import models
 from django.conf import settings
@@ -79,17 +79,27 @@ class Section(models.Model):
         return '%s-%s' % (self.course.course_id, self.code)
 
 
+course_regexes = [
+    re.compile(r'([A-Z]+) *(\d{3})(\d{3})'),
+    re.compile(r'([A-Z]+) *-(\d{3})-(\d{3})'),
+]
+
+
 def separate_course_code(course_code):
-    return list(map(lambda s: s.strip().upper(), course_code.split('-')))
+    course_code = course_code.replace(' ', '')
+    for regex in course_regexes:
+        m = regex.match(course_code)
+        if m is not None:
+            return m.group(1), m.group(2), m.group(3)
+
+    raise ValueError(f'Course code could not be parsed: {course_code}')
 
 
 def get_course_and_section(course_code, semester):
-    pieces = separate_course_code(course_code)
-    dept_code = pieces[0]
-    course_code = pieces[1]
-    section_id = pieces[2]
+    dept_code, course_id, section_id = separate_course_code(course_code)
+
     course, created = Course.objects.get_or_create(department=dept_code,
-                                                   code=course_code,
+                                                   code=course_id,
                                                    semester=semester)
     section, created = Section.objects.get_or_create(course=course, code=section_id)
 

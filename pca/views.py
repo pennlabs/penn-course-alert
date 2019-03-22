@@ -88,18 +88,6 @@ def get_sections(request):
     return JsonResponse(sections, safe=False)
 
 
-course_id_re = re.compile(r'([A-Z]+)(\d{3})(\d{3})')
-
-
-def normalize_course_id(c):
-    c = c.replace(' ', '')
-    m = course_id_re.match(c)
-    if m:
-        return f'{m.group(1).strip()}-{m.group(2).strip()}-{m.group(3).strip()}'
-    else:
-        return None
-
-
 def alert_for_course(c_id, semester, sent_by):
     send_course_alerts.delay(c_id, semester=semester, sent_by=sent_by)
 
@@ -171,15 +159,10 @@ def accept_webhook(request):
     if prev_status is None:
         return HttpResponse('Previous Status could not be extracted from response', status=400)
 
-    course_id_normalized = normalize_course_id(course_id)
-    if course_id_normalized is None:
-        logger.error('Could not parse course ID in JSON request', exc_info=True, extra={'request': request})
-        return HttpResponse('Could not parse course ID in JSON request', status=500)
-
     should_send_alert = get_bool('SEND_FROM_WEBHOOK', False) and \
         course_status == 'O' and get_value('SEMESTER') == course_term
 
-    record_update(course_id_normalized,
+    record_update(course_id,
                   course_term,
                   prev_status,
                   course_status,
@@ -187,7 +170,7 @@ def accept_webhook(request):
                   request.body)
 
     if should_send_alert:
-        alert_for_course(course_id_normalized, semester=course_term, sent_by='WEB')
+        alert_for_course(course_id, semester=course_term, sent_by='WEB')
         return JsonResponse({'message': 'webhook recieved, alerts sent'})
 
     else:
