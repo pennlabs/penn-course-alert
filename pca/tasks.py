@@ -88,6 +88,17 @@ def update_course_info(section_code, semester):
         upsert_course_from_opendata(data, semester)
 
 
+@shared_task(name='pca.tasks.send_alerts_from_status')
+def send_alerts_from_status(semester=None):
+    if semester is None:
+        semester = get_value('SEMESTER')
+    courses = api.get_all_course_availability(semester)
+    for course in courses:
+        course_id = course['course_section']
+        if course['status'] == 'O':
+            send_course_alerts.delay(course_id, semester, send_by='SERV')
+
+
 def should_send_alert(section_code, semester):
     new_data = api.get_course(section_code, semester)  # THIS IS A SLOW API CALL
     _, section = get_course_and_section(section_code, semester)

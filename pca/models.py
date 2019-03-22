@@ -142,12 +142,13 @@ class Registration(models.Model):
     notification_sent = models.BooleanField(default=False)
     notification_sent_at = models.DateTimeField(blank=True, null=True)
     METHOD_CHOICES = (
+        ('', 'Unsent'),
         ('LEG', '[Legacy] Sequence of course API requests'),
         ('WEB', 'Webhook'),
-        ('SVC', 'Course Status Service'),
+        ('SERV', 'Course Status Service'),
         ('ADM', 'Admin Interface'),
     )
-    notification_sent_by = models.CharField(max_length=16, choices=METHOD_CHOICES, default='LEG')
+    notification_sent_by = models.CharField(max_length=16, choices=METHOD_CHOICES, default='', blank=True)
 
     # track resubscriptions
     resubscribed_from = models.OneToOneField('Registration',
