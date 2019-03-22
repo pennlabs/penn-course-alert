@@ -43,6 +43,11 @@ def generate_course_json(semester=None, use_cache=True):
     return sections
 
 
+@shared_task(name='pca.tasks.update_course_json')
+def update_course_json():
+    generate_course_json(use_cache=False)
+
+
 @shared_task(name='pca.tasks.demo_alert')
 def demo_alert():
     return {'result': 'executed', 'name': 'pca.tasks.demo_alert'}

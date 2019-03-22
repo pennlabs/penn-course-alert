@@ -239,7 +239,8 @@ class CourseUpdate(models.Model):
     STATUS_CHOICES = (
         ('O', 'Open'),
         ('C', 'Closed'),
-        ('X', 'Cancelled')
+        ('X', 'Cancelled'),
+        ('', 'Unlisted')
     )
     section = models.ForeignKey(Section, on_delete=models.CASCADE)
     old_status = models.CharField(max_length=16, choices=STATUS_CHOICES)
@@ -247,6 +248,10 @@ class CourseUpdate(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     alert_sent = models.BooleanField()
     request_body = models.TextField()
+
+    def __str__(self):
+        d = dict(self.STATUS_CHOICES)
+        return f'{self.section.__str__()} - {d[self.old_status]} to {d[self.new_status]}'
 
 
 def record_update(section_id, semester, old_status, new_status, alerted, req):

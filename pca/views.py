@@ -1,5 +1,6 @@
 import re
 import base64
+import logging
 
 from django.shortcuts import render
 from django.http import HttpResponseRedirect, JsonResponse, Http404, HttpResponse
@@ -11,27 +12,33 @@ from .tasks import generate_course_json, send_course_alerts
 from options.models import get_bool
 
 
-# Helper function to return the homepage with a banner message.
-def homepage_with_msg(request, type_, msg):
+logger = logging.getLogger(__name__)
+
+
+def render_homepage(request, notifications):
     return render(request, 'index.html', {
-        'notification': {
-            'type': type_,
-            'text': msg
-        }
+        'notifications': notifications,
+        'recruiting': get_bool('RECRUITING', False)
     })
+
+
+# Helper function to return the homepage with a banner message.
+def homepage_with_msg(request, type_, msg, closeable=True):
+    return render_homepage(request, [{'type': type_, 'text': msg, 'closeable': closeable}])
 
 
 def homepage_closed(request):
     return homepage_with_msg(request,
                              'danger',
-                             "We're currently closed for signups. Come back after schedules have been released!")
+                             "We're currently closed for signups. Come back after schedules have been released!",
+                             False)
 
 
 def index(request):
     if not get_bool('REGISTRATION_OPEN', True):
         return homepage_closed(request)
 
-    return render(request, 'index.html')
+    return render(request, 'index.html', {'notifications': []})
 
 
 def register(request):
@@ -81,13 +88,14 @@ def get_sections(request):
     return JsonResponse(sections, safe=False)
 
 
-course_id_re = re.compile(r'([A-Z]{3,4})(\d{3})(\d{3})')
+course_id_re = re.compile(r'([A-Z]+)(\d{3})(\d{3})')
 
 
 def normalize_course_id(c):
+    c = c.replace(' ', '')
     m = course_id_re.match(c)
     if m:
-        return f'{m.group(1)}-{m.group(2)}-{m.group(3)}'
+        return f'{m.group(1).strip()}-{m.group(2).strip()}-{m.group(3).strip()}'
     else:
         return None
 
@@ -164,8 +172,12 @@ def accept_webhook(request):
         return HttpResponse('Previous Status could not be extracted from response', status=400)
 
     course_id_normalized = normalize_course_id(course_id)
+    if course_id_normalized is None:
+        logger.error('Could not parse course ID in JSON request', exc_info=True, extra={'request': request})
+        return HttpResponse('Could not parse course ID in JSON request', status=500)
 
-    should_send_alert = get_bool('SEND_FROM_WEBHOOK', False) and course_status == 'O'
+    should_send_alert = get_bool('SEND_FROM_WEBHOOK', False) and \
+        course_status == 'O' and get_value('SEMESTER') == course_term
 
     record_update(course_id_normalized,
                   course_term,

@@ -37,6 +37,7 @@ class InstructorAdmin(admin.ModelAdmin):
 
 class CourseUpdateAdmin(admin.ModelAdmin):
     autocomplete_fields = ('section', )
+    readonly_fields = ('created_at', )
 
 
 admin.site.register(Instructor, InstructorAdmin)
