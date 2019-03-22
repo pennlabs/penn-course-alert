@@ -140,10 +140,6 @@ CJFblaXvAAAAAElFTkSuQmCC"/>
 
       <div class="container has-text-centered is-block-mobile wrapper" style="margin-top:3.5rem" id="wrapper">
         <form id="submit_form" action="/submitted" method="POST">
-            <div class="notification is-warning" id="permit-warning">
-                <strong>Warning:</strong> After advanced registration, many CIS classes require you to sign up for the waitlist
-                if you would like a chance of getting into the class. <a href="//forms.cis.upenn.edu/waitlist/">Click here to sign up!</a>
-            </div>
           <div class="field" class="input-wrapper">
             <div class="control" id="bloodhound">
               <input class="input is-medium" id="courseTypeahead" type="text" placeholder="Course" name="course" required>
@@ -164,6 +160,10 @@ CJFblaXvAAAAAElFTkSuQmCC"/>
           <div class="control has-text-centered">
             <button class="button is-info" id="signup" type="submit">Submit</button>
           </div>
+        <div class="notification is-warning" id="permit-warning" style="margin-top: 1em;">
+            <strong>Warning:</strong> After advanced registration, many CIS classes require you to sign up for the waitlist
+            if you would like a chance of getting into the class. <a href="//forms.cis.upenn.edu/waitlist/">Click here to sign up!</a>
+        </div>
         </form>
       </div>
     </section>
