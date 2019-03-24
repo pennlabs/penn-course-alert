@@ -92,6 +92,9 @@ CJFblaXvAAAAAElFTkSuQmCC"/>
         padding: 0;
       }
       .notification {
+
+      }
+      .up-top {
           border-radius: 0;
           margin: 0 !important;
       }
@@ -101,14 +104,14 @@ CJFblaXvAAAAAElFTkSuQmCC"/>
   <body>
   <div id="main">
       {% if recruiting %}
-      <div class="has-text-centered notification is-info">
+      <div class="has-text-centered notification is-info up-top">
       Want to be part of the team that makes products like this? Penn Labs is recruiting.
           <a href="//apply.pennlabs.org">Apply here!</a>
       <button class="delete dismiss"></button>
       </div>
   {% endif %}
   {% for n in  notifications%}
-    <div class="has-text-centered notification {% if n.type == 'success' %} is-success
+    <div class="has-text-centered notification up-top {% if n.type == 'success' %} is-success
                                              {% elif n.type == 'danger' %} is-danger
                                              {% elif n.type == 'warning' %} is-warning {% else %} is-info {% endif %}"
        id="notificationBar">
@@ -142,6 +145,7 @@ CJFblaXvAAAAAElFTkSuQmCC"/>
               <input class="input is-medium" id="courseTypeahead" type="text" placeholder="Course" name="course" required>
             </div>
           </div>
+
           <div class="field" class="input-wrapper">
             <div class="control">
               <input class="input is-medium" type="text" placeholder="Email" id="email" name="email">
@@ -154,8 +158,12 @@ CJFblaXvAAAAAElFTkSuQmCC"/>
           </div>
           {% csrf_token %}
           <div class="control has-text-centered">
-            <button class="button is-info" type="submit">Submit</button>
+            <button class="button is-info" id="signup" type="submit">Submit</button>
           </div>
+        <div class="notification is-warning" id="permit-warning" style="margin-top: 1em;">
+            <strong>Warning:</strong> After advanced registration, many CIS classes require you to sign up for the waitlist
+            if you would like a chance of getting into the class. <a href="//forms.cis.upenn.edu/waitlist/">Click here to sign up!</a>
+        </div>
         </form>
       </div>
     </section>
@@ -210,12 +218,28 @@ CJFblaXvAAAAAElFTkSuQmCC"/>
 
 
     <script>
+      $(document).ready(function() {
+          $('#permit-warning').hide()
+
+          $('#courseTypeahead').on('input', e => {
+              if ($('#courseTypeahead').val().toLowerCase().indexOf('cis') !== -1) {
+                  $('#permit-warning').slideDown()
+              } else {
+                  $('#permit-warning').slideUp()
+              }
+          })
+      })
 
       // on submission of form, update local storage to remember user's data
       $('form').submit(e => {
+        /*
+        if ($('#courseTypeahead').val().toLowerCase().indexOf('cis') !== -1 && $('#permit-warning').is(":hidden")) {
+          $('#permit-warning').slideDown()
+          e.preventDefault();
+          return false;
+        }*/
         localStorage.setItem('lmkEmail', e.target.email.value);
         localStorage.setItem('lmkPhone', e.target.phone.value);
-        localStorage.setItem('lmkCarrier', e.target.carrier.value);
         localStorage.setItem('lmkNotifications', e.target.notifications.checked);
       });
 
@@ -285,10 +309,11 @@ CJFblaXvAAAAAElFTkSuQmCC"/>
       }
       $('.modal-background').click(() => {
           $('#modal').hide()
-      })
+      });
       $('.dismiss').click((e) => {
           $(e.target).parent().slideUp()
-      })
+      });
+
     </script>
   </body>
 </html>
