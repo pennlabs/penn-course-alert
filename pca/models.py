@@ -53,6 +53,13 @@ class Course(models.Model):
 
 
 class Section(models.Model):
+    STATUS_CHOICES = (
+        ('O', 'Open'),
+        ('C', 'Closed'),
+        ('X', 'Cancelled'),
+        ('', 'Unlisted'),
+    )
+
     class Meta:
         unique_together = (('code', 'course'), )
 
@@ -62,8 +69,7 @@ class Section(models.Model):
     code = models.CharField(max_length=16)
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
 
-    is_open = models.BooleanField(default=False)
-    is_open_updated_at = models.DateTimeField(blank=True, null=True)
+    status = models.CharField(max_length=4, choices=STATUS_CHOICES)
 
     capacity = models.IntegerField(default=0)
     activity = models.CharField(max_length=50, null=True, blank=True)
@@ -77,6 +83,10 @@ class Section(models.Model):
     def normalized(self):
         """String used for querying updates to this section with the Penn API"""
         return '%s-%s' % (self.course.course_id, self.code)
+
+    @property
+    def is_open(self):
+        return self.status == 'O'
 
 
 course_regexes = [
@@ -119,8 +129,7 @@ def upsert_course_from_opendata(info, semester):
     course.description = info['course_description'].replace('\uFFFD', '')
     course.save()
 
-    section.is_open = info['course_status'] == 'O'
-    section.is_open_updated_at = timezone.now()
+    section.status = info['course_status']
     section.capacity = int(info['max_enrollment'])
     section.activity = info['activity']
     section.meeting_times = json.dumps([meeting['meeting_days'] + ' '

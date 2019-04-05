@@ -58,7 +58,7 @@ class SendAlertsForSectionTestCase(TestCase):
             self.response = json.load(f)
 
     def assert_should_send(self, mock_get, was_open, now_open, should_send):
-        self.section.is_open = was_open
+        self.section.status = 'O' if was_open else 'C'
         self.section.save()
 
         self.response['course_status'] = 'O' if now_open else 'C'
