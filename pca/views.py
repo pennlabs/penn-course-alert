@@ -120,6 +120,7 @@ def extract_update_data(update):
 def handle_course_update(update):
     pass
 
+
 @csrf_exempt
 def accept_webhook(request):
     auth_header = request.META.get('Authorization', request.META.get('HTTP_AUTHORIZATION', ''))
