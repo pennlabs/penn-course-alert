@@ -58,6 +58,17 @@ def demo_task():
     return {'result': 'executed', 'name': 'pca.tasks.demo_task'}
 
 
+@shared_task(name='pca.tasks.run_course_updates')
+def run_course_updates(semester=None):
+    if semester is None:
+        updates = CourseUpdate.objects.all()
+    else:
+        updates = CourseUpdate.objects.filter(section__course__semester=semester)
+    for u in updates:
+        update_course_from_record(u)
+    return {'result': 'executed', 'name': 'pca.tasks.run_course_updates'}
+
+
 @shared_task(name='pca.tasks.load_courses')
 def load_courses(query='', semester=None):
     if semester is None:

@@ -541,3 +541,22 @@ class WebhookViewTestCase(TestCase):
         self.assertEqual(401, res.status_code)
         self.assertFalse(mock_alert.called)
         self.assertEqual(0, CourseUpdate.objects.count())
+
+
+class CourseStatusUpdateTestCase(TestCase):
+    def setUp(self):
+        self.course, self.section = get_course_and_section('CIS-120-001', TEST_SEMESTER)
+
+    def test_update_status(self):
+        self.section.status = 'C'
+        self.section.save()
+        up = record_update(self.section.normalized,
+                           TEST_SEMESTER,
+                           'C',
+                           'O',
+                           True,
+                           'JSON')
+        up.save()
+        update_course_from_record(up)
+        _, section = get_course_and_section(self.section.normalized, TEST_SEMESTER)
+        self.assertEqual('O', section.status)

@@ -282,4 +282,11 @@ def record_update(section_id, semester, old_status, new_status, alerted, req):
                      alert_sent=alerted,
                      request_body=req)
     u.save()
+    return u
+
+
+def update_course_from_record(update):
+    section = update.section
+    section.status = update.new_status
+    section.save()
 
