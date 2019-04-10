@@ -90,13 +90,13 @@ class Section(models.Model):
 
 
 course_regexes = [
-    re.compile(r'([A-Z]+) *(\d{3})(\d{3})'),
-    re.compile(r'([A-Z]+) *-(\d{3})-(\d{3})'),
+    re.compile(r'([A-Za-z]+) *(\d{3})(\d{3})'),
+    re.compile(r'([A-Za-z]+) *-(\d{3})-(\d{3})'),
 ]
 
 
 def separate_course_code(course_code):
-    course_code = course_code.replace(' ', '')
+    course_code = course_code.replace(' ', '').upper()
     for regex in course_regexes:
         m = regex.match(course_code)
         if m is not None:
