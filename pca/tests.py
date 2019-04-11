@@ -378,7 +378,7 @@ class GetCourseSectionTest(TestCase):
             'PSCI-131-001',
             'psci131001',
             'psci-131-001',
-            'psci 131 001'
+            'psci 131 001',
         ]
         for test in test_valid:
             self.assertCourseSame(test)
