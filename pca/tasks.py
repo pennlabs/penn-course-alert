@@ -107,8 +107,11 @@ def send_alerts_from_status(semester=None):
     for course in courses:
         course_id = course['course_section']
         if course['status'] == 'O':
-            for reg in get_active_registrations(course_id, semester):
-                send_alert.delay(reg.id, 'SERV')
+            try:
+                for reg in get_active_registrations(course_id, semester):
+                    send_alert.delay(reg.id, 'SERV')
+            except:
+                pass
 
 
 def should_send_alert(section_code, semester):
