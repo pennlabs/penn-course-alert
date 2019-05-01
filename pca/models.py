@@ -102,7 +102,9 @@ def separate_course_code(course_code):
         if m is not None:
             return m.group(1), m.group(2), m.group(3)
 
-    raise ValueError(f'Course code could not be parsed: {course_code}')
+    msg = f'Course code could not be parsed: {course_code}'
+    logger.exception(msg)
+    raise ValueError(msg)
 
 
 def get_course_and_section(course_code, semester):
@@ -275,7 +277,10 @@ class CourseUpdate(models.Model):
 
 
 def record_update(section_id, semester, old_status, new_status, alerted, req):
-    _, section = get_course_and_section(section_id, semester)
+    try:
+        _, section = get_course_and_section(section_id, semester)
+    except ValueError:
+        return None
     u = CourseUpdate(section=section,
                      old_status=old_status,
                      new_status=new_status,
@@ -286,7 +291,8 @@ def record_update(section_id, semester, old_status, new_status, alerted, req):
 
 
 def update_course_from_record(update):
-    section = update.section
-    section.status = update.new_status
-    section.save()
+    if update is not None:
+        section = update.section
+        section.status = update.new_status
+        section.save()
 

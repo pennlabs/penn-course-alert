@@ -173,8 +173,11 @@ def accept_webhook(request):
     update_course_from_record(u)
 
     if should_send_alert:
-        alert_for_course(course_id, semester=course_term, sent_by='WEB')
-        return JsonResponse({'message': 'webhook recieved, alerts sent'})
+        try:
+            alert_for_course(course_id, semester=course_term, sent_by='WEB')
+            return JsonResponse({'message': 'webhook recieved, alerts sent'})
+        except ValueError:
+            return JsonResponse({'message': 'course code could not be '})
 
     else:
         return JsonResponse({'message': 'webhook recieved'})
