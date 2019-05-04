@@ -177,7 +177,7 @@ def accept_webhook(request):
             alert_for_course(course_id, semester=course_term, sent_by='WEB')
             return JsonResponse({'message': 'webhook recieved, alerts sent'})
         except ValueError:
-            return JsonResponse({'message': 'course code could not be '})
+            return JsonResponse({'message': 'course code could not be parsed'})
 
     else:
         return JsonResponse({'message': 'webhook recieved'})
