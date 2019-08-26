@@ -38,7 +38,7 @@ def index(request):
     if not get_bool('REGISTRATION_OPEN', True):
         return homepage_closed(request)
 
-    return render(request, 'index.html', {'notifications': []})
+    return render_homepage(request, [])
 
 
 def register(request):
