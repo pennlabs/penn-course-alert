@@ -11,7 +11,7 @@ from django.utils import timezone
 from django import urls
 
 from .alerts import Email, Text
-from shortener.models import shorten
+from shortener.models import Url
 from options.models import get_value, get_bool
 
 import phonenumbers  # library for parsing and formatting phone numbers.
@@ -198,7 +198,7 @@ class Registration(models.Model):
     def resub_url(self):
         """Get the resubscribe URL associated with this registration"""
         full_url = '%s%s' % (settings.BASE_URL, urls.reverse('resubscribe', kwargs={'id_': self.id}))
-        return shorten(full_url).shortened
+        return Url.objects.get_or_create(full_url).shortened
 
     def alert(self, forced=False, sent_by=''):
         if forced or not self.notification_sent:
