@@ -48,6 +48,7 @@ $(document).ready(function(){
     name: 'states',
     source: courses,
     display: 'section_id',
+    limit: 100,
     templates: {
       empty: '<div class="lmk-rec-element card"><div class="card-content">No matching courses found.</div></div>',
       suggestion: function(data) {
