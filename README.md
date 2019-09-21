@@ -1,4 +1,7 @@
 # Penn Course Alert
+
+**This repository has been archived in favor of [`pennlabs/penn-courses`](https://github.com/pennlabs/penn-courses/)**.
+
 [![Coverage Status](https://coveralls.io/repos/github/pennlabs/penn-course-alert/badge.svg?branch=master)](https://coveralls.io/github/pennlabs/penn-course-alert?branch=master)
 [![CircleCI](https://circleci.com/gh/pennlabs/penn-course-alert/tree/master.svg?style=svg)](https://circleci.com/gh/pennlabs/penn-course-alert/tree/master)
 
